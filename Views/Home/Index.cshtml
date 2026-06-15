@@ -1,0 +1,127 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="everkeep-hero container fade-in">
+
+    <div class="row align-items-center text-center text-md-start">
+
+        <!-- LOGO -->
+        <div class="col-md-5 mb-4 mb-md-0 text-center">
+            <img src="~/images/logo_full.png" class="hero-logo img-fluid" alt="Everkeep Logo" />
+        </div>
+
+        <!-- TEXTO -->
+        <div class="col-md-7">
+
+            <h1 class="hero-title">
+                Guarde o que realmente importa
+            </h1>
+
+            <p class="hero-subtitle mt-3">
+                Um espaço simples e acolhedor para mensagens com significado, memórias e conexões que fazem diferença.
+            </p>
+
+            <div class="mt-4 d-flex justify-content-center gap-3">
+                <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-everkeep me-2">
+                    Criar conta
+                </a>
+
+                <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-everkeep">
+                    Já tenho conta
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- SEÇÃO DE VALOR -->
+<section class="everkeep-highlight text-center">
+
+    <div class="container">
+
+        <h2 class="highlight-title">
+            Mais do que mensagens
+        </h2>
+
+        <p class="highlight-subtitle mt-3">
+            O Everkeep não é sobre quantidade.
+            É sobre guardar palavras, momentos e sentimentos que realmente importam.
+        </p>
+
+        <!-- FEATURES -->
+        <div class="row mt-5 justify-content-center">
+
+            <div class="col-md-4">
+                <div class="feature-card">
+
+                    <div class="feature-icon">💬</div>
+
+                    <h5>Mensagens com significado</h5>
+
+                    <p>
+                        Converse de forma simples, mas com intenção.
+                    </p>
+
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-card">
+
+                    <div class="feature-icon">📖</div>
+
+                    <h5>Diário pessoal</h5>
+
+                    <p>
+                        Registe pensamentos, sentimentos e momentos importantes.
+                    </p>
+
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-card">
+
+                    <div class="feature-icon">⭐</div>
+
+                    <h5>Memórias</h5>
+
+                    <p>
+                        Guarde e revisite aquilo que merece ser lembrado.
+                    </p>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- CTA FINAL -->
+<section class="everkeep-cta text-center">
+
+    <div class="container">
+
+        <h3 class="cta-title">Comece hoje</h3>
+
+        <p class="cta-subtitle mt-2">
+            Pequenas mensagens podem ter um grande significado.
+        </p>
+
+        <div class="mt-4">
+            <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-everkeep">
+                Criar conta gratuita
+            </a>
+        </div>
+
+    </div>
+
+</section>

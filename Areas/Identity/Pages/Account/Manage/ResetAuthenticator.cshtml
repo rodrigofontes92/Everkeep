@@ -1,0 +1,67 @@
+﻿@page
+@model ResetAuthenticatorModel
+
+@{
+    ViewData["Title"] = "Repor aplicação autenticadora";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+}
+
+<div class="manage-content-inner">
+
+    <!-- TÍTULO -->
+    <div class="mb-4">
+
+        <h2>
+            Repor aplicação autenticadora
+        </h2>
+
+        <p>
+            Esta ação irá desligar temporariamente a segurança adicional da sua conta.
+        </p>
+
+    </div>
+
+    <partial name="_StatusMessage" for="StatusMessage" />
+
+    <!-- AVISO -->
+    <div class="everkeep-alert warning mb-4">
+
+        <strong>
+            Importante:
+        </strong>
+
+        <p style="margin-top:6px; margin-bottom:0;">
+            Após repor a aplicação autenticadora, será necessário configurá-la novamente.
+        </p>
+
+        <p style="margin-top:8px; margin-bottom:0;">
+            Enquanto não concluir a configuração, a segurança adicional ficará desativada.
+        </p>
+
+    </div>
+
+    <!-- FORM -->
+    <form id="reset-authenticator-form" method="post">
+
+        <div class="text-center mt-4 d-flex justify-content-center gap-3">
+
+            <button id="reset-authenticator-button"
+                    class="btn btn-outline-danger"
+                    type="submit">
+
+                Repor aplicação
+
+            </button>
+
+            <a asp-page="./TwoFactorAuthentication"
+                   class="btn btn-everkeep">
+
+                Voltar
+
+            </a>
+
+        </div>
+
+    </form>
+
+</div>

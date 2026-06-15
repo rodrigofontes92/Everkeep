@@ -1,0 +1,115 @@
+﻿<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewData["Title"] - Everkeep</title>
+
+    <script type="importmap"></script>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- Everkeep CSS -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Everkeep.styles.css" asp-append-version="true" />
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito&family=Playfair+Display&display=swap" rel="stylesheet">
+</head>
+
+<body class="everkeep-body">
+    <div class="everkeep-wrapper">
+
+        <!-- NAVBAR -->
+        <header>
+            <nav class="navbar navbar-expand-sm everkeep-navbar mb-3">
+                <div class="container-fluid">
+
+                    <!-- LOGO + NOME -->
+                    <a class="navbar-brand d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
+                        <img src="~/images/logofont.png" class="everkeep-logo" />
+                    </a>
+
+                    <!-- BOTÃO MOBILE -->
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <!-- MENU -->
+                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+
+                        <!-- LINKS ESQUERDA -->
+                        <ul class="navbar-nav flex-grow-1">
+
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link everkeep-link" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link everkeep-link" asp-controller="Profile" asp-action="Index">Perfil</a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link everkeep-link" asp-controller="Conexao" asp-action="Index">Conexões</a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link everkeep-link" asp-controller="Mensagem" asp-action="Index">Mensagens</a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link everkeep-link" asp-controller="Diario" asp-action="Index">Meu Diário</a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link everkeep-link" asp-controller="Memorias" asp-action="Index">Minhas Memórias</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link everkeep-link" asp-controller="Home" asp-action="Privacy">Privacidade</a>
+                                </li>
+
+                            }
+
+                        </ul>
+
+                        <!-- LOGIN / LOGOUT (IDENTITY) -->
+                        <div class="d-flex align-items-center">
+                            <partial name="_LoginPartial" />
+                        </div>
+
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <!-- CONTEÚDO -->
+        <div class="container">
+            <main role="main" class="pb-4">
+                @RenderBody()
+            </main>
+        </div>
+
+        <!-- FOOTER -->
+        <footer class="footer-everkeep mt-5">
+            <div class="container text-center">
+                <span>© 2026 Everkeep · Guardar hoje, valorizar sempre</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

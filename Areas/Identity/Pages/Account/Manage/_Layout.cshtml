@@ -1,0 +1,60 @@
+﻿@{
+    if (ViewData.TryGetValue("ParentLayout", out var parentLayout) && parentLayout != null)
+    {
+        Layout = parentLayout.ToString();
+    }
+    else
+    {
+        Layout = "/Areas/Identity/Pages/_Layout.cshtml";
+    }
+}
+
+<div class="container mt-5">
+
+    <!-- HEADER -->
+    <div class="text-center mb-5">
+
+        <h1 class="hero-title" style="font-size:34px;">
+            A sua conta
+        </h1>
+
+        <p class="hero-subtitle">
+            Gerencie os seus dados com tranquilidade e segurança.
+        </p>
+
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="everkeep-card p-4">
+
+        <div class="row">
+
+            <!-- MENU LATERAL -->
+            <div class="col-md-3 mb-4">
+
+                <div class="manage-nav-container">
+                    <partial name="_ManageNav" />
+                </div>
+
+            </div>
+
+            <!-- CONTEÚDO -->
+            <div class="col-md-9">
+
+                <div class="manage-content">
+
+                    @RenderBody()
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

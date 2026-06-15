@@ -1,0 +1,80 @@
+﻿@page
+@model PersonalDataModel
+
+@{
+    ViewData["Title"] = "Dados pessoais";
+    ViewData["ActivePage"] = ManageNavPages.PersonalData;
+}
+
+<div class="manage-content-inner">
+
+    <!-- TÍTULO -->
+    <div class="mb-4">
+
+        <h2>
+            Os seus dados
+        </h2>
+
+        <p>
+            Pode consultar ou gerir os dados associados à sua conta.
+        </p>
+
+    </div>
+
+    <!-- INFO -->
+    <div class="everkeep-card p-3 mb-4">
+
+        <p style="color:#666; margin-bottom:10px;">
+            Esta conta contém informações que partilhou connosco.
+        </p>
+
+        <p style="color:#666;">
+            Pode descarregar os seus dados ou optar por remover a sua conta.
+        </p>
+
+    </div>
+
+    <!-- DOWNLOAD -->
+    <div class="mb-4 text-center">
+
+        <form id="download-data" asp-page="DownloadPersonalData" method="post">
+
+            <button class="btn btn-everkeep" type="submit">
+                Descarregar dados
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- AVISO -->
+    <div class="everkeep-alert danger mb-4">
+
+        <strong>
+            Atenção:
+        </strong>
+
+        <p style="margin-top:6px; margin-bottom:0;">
+            Ao eliminar a sua conta, todos os dados serão removidos de forma permanente e não poderão ser recuperados.
+        </p>
+
+    </div>
+
+    <!-- ELIMINAR -->
+    <div class="text-center">
+
+        <a id="delete"
+               asp-page="DeletePersonalData"
+               class="btn btn-outline-danger">
+
+            Eliminar conta
+
+        </a>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

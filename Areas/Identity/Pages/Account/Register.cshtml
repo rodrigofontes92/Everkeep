@@ -1,0 +1,93 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Criar conta";
+}
+
+<div class="container fade-in">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-6 col-lg-5">
+
+            <div class="everkeep-card p-4">
+
+                <!-- TÍTULO -->
+                <div class="text-center mb-4">
+                    <h2 class="hero-title" style="font-size: 36px;">
+                        Crie o seu espaço
+                    </h2>
+
+                    <p class="hero-subtitle">
+                        Um lugar simples e acolhedor para guardar o que realmente importa.
+                    </p>
+                </div>
+
+                <!-- FORMULÁRIO -->
+                <form method="post">
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <!-- NOME -->
+                    <div class="form-group mb-3">
+                        <label asp-for="Input.Nome" class="form-label">Nome</label>
+                        <input asp-for="Input.Nome" class="form-control everkeep-input" placeholder="Seu nome" />
+                        <span asp-validation-for="Input.Nome" class="text-danger"></span>
+                    </div>
+
+                    <!-- EMAIL -->
+                    <div class="form-group mb-3">
+                        <label asp-for="Input.Email" class="form-label">Email</label>
+                        <input asp-for="Input.Email" class="form-control everkeep-input" placeholder="o.seu@email.com" />
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+
+                    <!-- BIO -->
+                    <div class="form-group mb-3">
+                        <label asp-for="Input.Bio" class="form-label">Bio</label>
+                        <textarea asp-for="Input.Bio" class="form-control everkeep-input" placeholder="Escreva algo sobre você"></textarea>
+                    </div>
+
+                    <!-- PASSWORD -->
+                    <div class="form-group mb-3">
+                        <label asp-for="Input.Password" class="form-label">Palavra-passe</label>
+                        <input asp-for="Input.Password" class="form-control everkeep-input" placeholder="Crie uma palavra-passe" />
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+
+                    <!-- CONFIRMAR PASSWORD -->
+                    <div class="form-group mb-4">
+                        <label asp-for="Input.ConfirmPassword" class="form-label">Confirmar palavra-passe</label>
+                        <input asp-for="Input.ConfirmPassword" class="form-control everkeep-input" placeholder="Repita a palavra-passe" />
+                        <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                    </div>
+
+                    <!-- BOTÃO -->
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-everkeep w-100">
+                            Criar conta
+                        </button>
+                    </div>
+
+                </form>
+
+                <!-- APOIO -->
+                <div class="text-center mt-4">
+
+                    <p style="color:#666;">
+                        Já tem conta?
+                    </p>
+
+                    <a asp-page="./Login" class="everkeep-link">
+                        Iniciar sessão
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

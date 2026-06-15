@@ -1,0 +1,98 @@
+﻿@using Everkeep.ViewModels
+
+@model ProfileViewModel
+
+@{
+    ViewData["Title"] = "Editar Perfil";
+}
+
+<div class="container fade-in">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-8">
+
+            <div class="everkeep-card p-4">
+
+                <!-- TÍTULO -->
+                <div class="text-center mb-4">
+
+                    <h2 class="hero-title" style="font-size:32px;">
+                        Editar perfil
+                    </h2>
+
+                    <p class="hero-subtitle">
+                        Ajuste o que quiser — este espaço é seu.
+                    </p>
+
+                </div>
+
+                <form asp-action="Edit" method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <!-- NOME -->
+                    <div class="form-group mb-4">
+
+                        <label class="form-label-everkeep">
+                            Nome
+                        </label>
+
+                        <input asp-for="Nome"
+                               class="form-control everkeep-input"
+                               placeholder="Como gostaria de ser chamado?" />
+
+                    </div>
+
+
+                    <!-- BIO -->
+                    <div class="form-group mb-4">
+
+                        <label class="form-label-everkeep">
+                            Sobre você
+                        </label>
+
+                        <textarea asp-for="Bio"
+                                  class="form-control everkeep-textarea"
+                                  rows="3"
+                                  placeholder="Escreva algo que faça sentido para você..."></textarea>
+
+                    </div>
+
+
+                    <!-- ESTADO EMOCIONAL -->
+                    <div class="form-group mb-4">
+
+                        <label class="form-label-everkeep">
+                            Como você está hoje?
+                        </label>
+
+                        <input asp-for="EstadoEmocional"
+                               class="form-control everkeep-input"
+                               placeholder="Ex: tranquilo, motivado, reflexivo..." />
+
+                    </div>
+
+
+                    <!-- AÇÕES -->
+                    <div class="text-center d-flex justify-content-center gap-3 mt-4">
+
+                        <button type="submit" class="btn btn-everkeep">
+                            Guardar alterações
+                        </button>
+
+                        <a asp-action="Index" class="btn btn-outline-everkeep">
+                            Cancelar
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,67 @@
+﻿@using Everkeep.ViewModels
+
+@model List<ConversaViewModel>
+
+@{
+    ViewData["Title"] = "Mensagens";
+}
+
+<div class="container fade-in">
+
+    <!-- HEADER -->
+    <br>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h2 class="section-title">Mensagens</h2>
+
+        <a asp-action="Nova" class="btn btn-everkeep">
+            Nova mensagem
+        </a>
+
+    </div>
+
+    <!-- LISTA -->
+    <div class="row">
+
+        @if (!Model.Any())
+        {
+            <div class="col-12">
+                <div class="everkeep-card text-center">
+
+                    <p style="color:#777;">
+                        Ainda não tem mensagens.
+                        Comece por iniciar uma nova.
+                    </p>
+
+                </div>
+            </div>
+        }
+        else
+        {
+            foreach (var c in Model)
+            {
+                <div class="col-md-6 mb-3">
+
+                    <a asp-action="Chat"
+                           asp-route-userId="@c.OutroUserId"
+                           class="dashboard-card">
+
+                        <h5>@c.Nome</h5>
+
+                        <p style="color:#777;">
+                            @c.UltimaMensagem
+                        </p>
+
+                        <small style="color:#aaa;">
+                            @c.DataUltimaMensagem.ToString("dd/MM/yyyy HH:mm")
+                        </small>
+
+                    </a>
+
+                </div>
+            }
+        }
+
+    </div>
+
+</div>

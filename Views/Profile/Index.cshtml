@@ -1,0 +1,146 @@
+﻿@using Everkeep.ViewModels
+
+@model ProfileViewModel
+
+@{
+    ViewData["Title"] = "O Meu Perfil";
+}
+
+@{
+    bool isMeuPerfil = Model.UserId == Model.CurrentUserId;
+}
+
+<div class="container fade-in">
+
+    <!-- HEADER -->
+    <div class="profile-header text-center mb-5">
+
+        <div class="profile-avatar">
+            👤
+        </div>
+
+        <h2 class="profile-name mt-3">
+            @Model.Nome
+        </h2>
+
+        @if (Model.EstadoConexao == "Aceite")
+        {
+            <p class="profile-email">
+                @Model.Email
+            </p>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.Bio))
+        {
+            <p class="profile-bio mt-2">
+                @Model.Bio
+            </p>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.EstadoEmocional))
+        {
+            <p class="profile-estado mt-2">
+                Hoje sinto-me @Model.EstadoEmocional
+            </p>
+        }
+
+    </div>
+
+
+    <!-- AÇÕES -->
+    <div class="text-center mb-5">
+
+        @if (isMeuPerfil)
+        {
+            <a asp-action="Edit" class="btn btn-everkeep">
+                Editar perfil
+            </a>
+        }
+        else
+        {
+            @if (Model.EstadoConexao == "Aceite")
+            {
+                <a asp-controller="Mensagem"
+                       asp-action="Chat"
+                       asp-route-userId="@Model.UserId"
+                       class="btn btn-everkeep">
+                    Enviar mensagem
+                </a>
+            }
+            else if (Model.EstadoConexao == "Pendente")
+            {
+                <p style="color:#777;">
+                    Pedido pendente
+                </p>
+            }
+            else
+            {
+                <!-- REDIRECIONA PARA CONEXÕES -->
+                <a asp-controller="Conexao"
+                       asp-action="Index"
+                       class="btn btn-outline-everkeep">
+                    Conectar
+                </a>
+            }
+        }
+
+    </div>
+
+
+    <!-- CONTEÚDO -->
+    @if (Model.PodeVerPerfil)
+    {
+        <div>
+
+            <h4 class="section-title mb-3">
+                Momentos partilhados
+            </h4>
+
+            @if (!Model.DiariosPublicos.Any())
+            {
+                <div class="everkeep-card text-center p-3">
+                    <p style="color:#777;">
+                        Ainda não há momentos públicos.
+                    </p>
+                </div>
+            }
+            else
+            {
+                <div class="row">
+
+                    @foreach (var d in Model.DiariosPublicos)
+                    {
+                        <div class="col-md-6 mb-3">
+
+                            <div class="diario-card">
+
+                                <p class="diario-texto">
+                                    @d.Conteudo
+                                </p>
+
+                                <small style="color:#777;">
+                                    @d.DataCriacao.ToString("dd MMM yyyy")
+                                </small>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+            }
+
+        </div>
+    }
+    else
+    {
+        <div class="everkeep-card text-center p-4">
+
+            <p style="color:#777;">
+                Este perfil está disponível apenas para conexões.
+            </p>
+
+        </div>
+    }
+
+</div>

@@ -1,0 +1,44 @@
+# Build
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Logs
+*.log
+
+# Database
+*.mdf
+*.ldf
+
+# App settings
+appsettings.Development.json
+
+# Personal documents
+14.Rodrigo.Fontes.pdf
+
+# Publish
+publish/
+
+# Rider
+.idea/
+
+# Resharper
+_ReSharper*/
+*.DotSettings.user
+
+# OS files
+Thumbs.db
+Desktop.ini
+
+# NuGet
+packages/
+
+# Generated files
+wwwroot/lib/
+
+# Secrets
+secrets.json

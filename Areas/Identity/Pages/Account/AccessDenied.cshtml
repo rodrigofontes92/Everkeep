@@ -1,0 +1,54 @@
+﻿@page
+@model AccessDeniedModel
+
+@{
+    ViewData["Title"] = "Acesso limitado";
+}
+
+<div class="container fade-in mt-5">
+
+    <div class="everkeep-card text-center p-5">
+
+        <!-- ÍCONE -->
+        <div style="font-size:40px;">
+            🔒
+        </div>
+
+        <!-- TÍTULO -->
+        <h2 class="hero-title mt-3">
+            Não é possível aceder
+        </h2>
+
+        <!-- TEXTO -->
+        <p class="hero-subtitle mt-3" style="max-width:500px; margin:0 auto;">
+
+            Este conteúdo não está disponível para si neste momento.
+            <br />
+            Pode estar reservado apenas para conexões ou para o próprio utilizador.
+
+        </p>
+
+        <!-- AÇÕES -->
+        <div class="mt-4 d-flex justify-content-center gap-3">
+
+            <a asp-controller="Home"
+                   asp-action="Index"
+                   class="btn btn-everkeep">
+
+                Voltar ao início
+
+            </a>
+
+            <a asp-controller="Conexao"
+                   asp-action="Index"
+                   class="btn btn-outline-everkeep">
+
+                Ver conexões
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>

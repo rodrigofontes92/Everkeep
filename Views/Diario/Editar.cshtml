@@ -1,0 +1,63 @@
+﻿@using Everkeep.ViewModels
+
+@model DiarioViewModel
+
+@{
+    ViewData["Title"] = "Editar Diário";
+}
+
+<br>
+<div class="container fade-in">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-8">
+
+            <div class="everkeep-card p-4">
+
+                <div class="text-center mb-4">
+
+                    <h2 class="hero-title" style="font-size:32px;">
+                        Editar diário
+                    </h2>
+
+                    <p class="hero-subtitle">
+                        Pode ajustar o que escreveu, se fizer sentido.
+                    </p>
+
+                </div>
+
+                <form asp-action="Editar" method="post">
+
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="form-group mb-4">
+
+                        <textarea asp-for="Conteudo"
+                                  class="form-control diario-textarea"
+                                  rows="16"
+                        ></textarea>
+
+                    </div>
+
+                    <div class="text-center d-flex justify-content-center gap-3">
+
+                        <button type="submit" class="btn btn-everkeep">
+                            Guardar alterações
+                        </button>
+
+                        <a asp-action="Index" class="btn btn-outline-everkeep">
+                            Cancelar
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

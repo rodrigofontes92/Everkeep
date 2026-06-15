@@ -1,0 +1,115 @@
+﻿@model Everkeep.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container fade-in">
+
+    <!-- SAUDAÇÃO -->
+    <div class="dashboard-hero text-center">
+
+        <h1 class="dashboard-title">
+            Olá, @Model.Nome
+        </h1>
+
+        <p class="dashboard-subtitle mt-3">
+            Hoje pode ser um bom dia para guardar algo importante.
+        </p>
+
+    </div>
+
+
+    <!-- AÇÕES RÁPIDAS -->
+    <div class="row mt-5">
+
+        <div class="col-md-4">
+            <a asp-controller="Mensagem" asp-action="Nova" class="dashboard-card text-center">
+
+                <div class="dashboard-icon">💬</div>
+
+                <h5>Nova mensagem</h5>
+
+                <p>
+                    Partilhe algo com alguém especial
+                </p>
+
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a asp-controller="Diario" asp-action="Criar" class="dashboard-card text-center">
+
+                <div class="dashboard-icon">📖</div>
+
+                <h5>Escrever no diário</h5>
+
+                <p>
+                    Registe um pensamento ou momento
+                </p>
+
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a asp-controller="Memorias" asp-action="Index" class="dashboard-card text-center">
+
+                <div class="dashboard-icon">⭐</div>
+
+                <h5>Ver memórias</h5>
+
+                <p>
+                    Revisite o que já guardou
+                </p>
+
+            </a>
+        </div>
+
+    </div>
+
+
+    <!-- FRASE EMOCIONAL -->
+    <div class="dashboard-quote text-center mt-5">
+
+        <p>
+            "Às vezes, são as pequenas palavras que ficam para sempre."
+        </p>
+
+    </div>
+
+
+    <!-- ÚLTIMAS INTERAÇÕES -->
+    <div class="mt-5">
+
+        <h4 class="section-title mb-3">
+            Últimas interações
+        </h4>
+
+        <div class="everkeep-card p-4">
+
+            @if (Model.TemInteracoes)
+            {
+                <ul class="list-unstyled m-0">
+
+                    @foreach (var item in Model.UltimasInteracoes)
+                    {
+                        <li class="interaction-item">
+                            @item
+                        </li>
+                    }
+
+                </ul>
+            }
+            else
+            {
+                <p class="text-muted m-0">
+                    Ainda não há interações recentes.
+                    Comece por enviar uma mensagem ou escrever no diário.
+                </p>
+            }
+
+        </div>
+
+    </div>
+
+</div>

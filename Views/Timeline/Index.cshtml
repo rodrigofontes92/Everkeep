@@ -1,0 +1,33 @@
+﻿@using Everkeep.ViewModels
+
+@model List<TimelineViewModel>
+
+<h2>📅 Linha do Tempo</h2>
+
+@if (!Model.Any())
+{
+    <p>Sem atividade ainda.</p>
+}
+else
+{
+    foreach (var item in Model)
+    {
+        <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+
+            <p>
+                <strong>
+                    @(item.Tipo == "Mensagem" ? "💬 Mensagem" : "📝 Diário")
+                </strong>
+            </p>
+
+            @if (item.Tipo == "Mensagem")
+            {
+                <p><small>Com: @item.OutroUserNome</small></p>
+            }
+
+            <p>@item.Conteudo</p>
+            <small>@item.Data</small>
+
+        </div>
+    }
+}

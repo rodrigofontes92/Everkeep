@@ -1,0 +1,79 @@
+﻿@page
+@model IndexModel
+
+@{
+    ViewData["Title"] = "A sua conta";
+    ViewData["ActivePage"] = ManageNavPages.Index;
+}
+
+<div class="manage-content-inner">
+
+    <!-- TÍTULO -->
+    <div class="mb-4">
+
+        <h2>
+            Dados do utilizador
+        </h2>
+
+        <p>
+            Pode atualizar as suas informações básicas sempre que quiser.
+        </p>
+
+    </div>
+
+    <!-- STATUS -->
+    <partial name="_StatusMessage" for="StatusMessage" />
+
+    <!-- FORM -->
+    <form id="profile-form" method="post">
+
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+        <!-- EMAIL / USERNAME -->
+        <div class="form-group mb-4">
+
+            <label class="form-label-everkeep">
+                Email
+            </label>
+
+            <input asp-for="Username"
+                   class="form-control everkeep-input"
+                   disabled />
+
+        </div>
+
+        <!-- TELEMÓVEL -->
+        <div class="form-group mb-4">
+
+            <label class="form-label-everkeep">
+                Telemóvel
+            </label>
+
+            <input asp-for="Input.PhoneNumber"
+                   class="form-control everkeep-input"
+                   placeholder="Opcional" />
+
+            <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+
+        </div>
+
+        <!-- BOTÃO -->
+        <div class="text-center mt-4">
+
+            <button id="update-profile-button"
+                    type="submit"
+                    class="btn btn-everkeep">
+
+                Guardar alterações
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

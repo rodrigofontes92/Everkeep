@@ -1,0 +1,262 @@
+﻿@using Everkeep.ViewModels
+
+@model List<ConexaoViewModel>
+
+@{
+    ViewData["Title"] = "Conexões";
+}
+
+<div class="container fade-in">
+
+    <!-- TÍTULO -->
+    <div class="text-center mb-5">
+        <br>
+        <h2 class="hero-title" style="font-size:36px;">
+            Conexões
+        </h2>
+
+        <p class="hero-subtitle">
+            Pessoas com quem partilha momentos com significado.
+        </p>
+
+    </div>
+
+    <!-- ALERTAS -->
+    @{
+        var sucesso = TempData["Sucesso"]?.ToString();
+        var erro = TempData["Erro"]?.ToString();
+    }
+
+    @if (!string.IsNullOrEmpty(sucesso))
+    {
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+
+            @sucesso
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close">
+            </button>
+
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(erro))
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+
+            @erro
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close">
+            </button>
+
+        </div>
+    }
+
+
+    <!-- NOVO CONVITE -->
+    <div class="everkeep-card p-3 mb-5">
+
+        <form asp-action="EnviarConvite" method="post" class="d-flex gap-2">
+
+            <input type="email"
+                   name="email"
+                   class="form-control everkeep-input"
+                   placeholder="Email da pessoa"
+                   required />
+
+            <button type="submit" class="btn btn-everkeep">
+                Convidar
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- CONEXÕES ACEITES -->
+    <h4 class="section-title mb-3">Conexões</h4>
+
+    <div class="row mb-5">
+        @{
+            /*
+            * Where:
+            * filtra apenas conexões aceites.
+            *
+            * ToList:
+            * converte o resultado LINQ numa lista.
+            */
+            var aceites = Model.Where(c => c.Estado == "Aceite").ToList();
+        }
+
+        @* Any:
+           verifica se a coleção possui elementos. *@
+        @if (!aceites.Any())
+        {
+            <div class="col-12">
+                <div class="everkeep-card text-center p-3">
+                    <p style="color:#777;">
+                        Ainda não tem conexões.
+                    </p>
+                </div>
+            </div>
+        }
+        else
+        {
+            foreach (var c in aceites)
+            {
+                <div class="col-md-4 mb-3">
+
+                    <div class="dashboard-card text-center">
+
+                        <h5>@c.Nome</h5>
+
+                        <div class="mt-2 d-flex justify-content-center gap-2">
+
+                            <a asp-controller="Profile"
+                                   asp-action="Index"
+                                   asp-route-userId="@c.OutroUserId"
+                                   class="btn btn-outline-everkeep btn-sm">
+                                Perfil
+                            </a>
+
+                            <form asp-action="Remover" method="post" class="form-remover">
+                                <input type="hidden" name="id" value="@c.Id" />
+
+                                <button type="button"
+                                        class="btn btn-everkeep btn-sm"
+                                        onclick="confirmarRemocao(this)">
+                                    Remover
+                                </button>
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+        }
+    </div>
+
+
+    <!-- PENDENTES -->
+    <h4 class="section-title mb-3">Pendentes</h4>
+
+    <div class="row mb-5">
+        @{
+            var pendentes = Model.Where(c => c.Estado == "Pendente").ToList();
+        }
+
+        @if (!pendentes.Any())
+        {
+            <div class="col-12">
+                <div class="everkeep-card text-center p-3">
+                    <p style="color:#777;">
+                        Sem pedidos pendentes.
+                    </p>
+                </div>
+            </div>
+        }
+        else
+        {
+            foreach (var c in pendentes)
+            {
+                <div class="col-md-4 mb-3">
+
+                    <div class="dashboard-card text-center">
+
+                        <h5>@c.Nome</h5>
+
+                        <!-- RECEBIDO -->
+                        @if (c.FoiRecebido)
+                        {
+                            <div class="mt-2 d-flex justify-content-center gap-2">
+
+                                <form asp-action="Aceitar" method="post">
+                                    <input type="hidden" name="id" value="@c.Id" />
+                                    <button class="btn btn-everkeep btn-sm">
+                                        Aceitar
+                                    </button>
+                                </form>
+
+                                <form asp-action="Rejeitar" method="post">
+                                    <input type="hidden" name="id" value="@c.Id" />
+                                    <button class="btn btn-outline-everkeep btn-sm">
+                                        Rejeitar
+                                    </button>
+                                </form>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <p style="color:#777;" class="mt-2">
+                                Convite enviado
+                            </p>
+                        }
+
+                    </div>
+
+                </div>
+            }
+        }
+    </div>
+
+</div>
+
+<div id="modalRemover" class="modal-everkeep">
+
+    <div class="modal-content">
+
+        <p class="modal-text">
+            Tem a certeza que deseja remover esta conexão?
+        </p>
+
+        <p class="modal-subtext">
+            Deixará de poder trocar mensagens com esta pessoa.
+        </p>
+
+        <div class="modal-actions">
+
+            <button onclick="fecharModalRemover()" class="btn btn-outline-everkeep">
+                Cancelar
+            </button>
+
+            <button id="confirmRemoveBtn" class="btn btn-everkeep">
+                Remover
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+
+        let formParaRemover = null;
+
+        function confirmarRemocao(botao) {
+            formParaRemover = botao.closest("form");
+            document.getElementById("modalRemover").style.display = "flex";
+        }
+
+        function fecharModalRemover() {
+            document.getElementById("modalRemover").style.display = "none";
+            formParaRemover = null;
+        }
+
+        document.getElementById("confirmRemoveBtn").addEventListener("click", function () {
+            if (formParaRemover) {
+                formParaRemover.submit();
+            }
+        });
+
+    </script>
+}

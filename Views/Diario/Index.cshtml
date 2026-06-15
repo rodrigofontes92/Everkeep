@@ -1,0 +1,188 @@
+﻿@using Everkeep.ViewModels
+
+@model List<DiarioViewModel>
+
+@{
+    ViewData["Title"] = "Meu Diário";
+}
+
+<div class="container">
+
+    <!-- TÍTULO -->
+    <div class="text-center mb-5">
+        <br>
+        <h2 class="hero-title" style="font-size:36px;">
+            Diário
+        </h2>
+
+        <p class="hero-subtitle">
+            Um espaço só seu, para guardar pensamentos e momentos.
+        </p>
+
+    </div>
+
+
+    <!-- BOTÃO NOVO -->
+    <div class="text-center mb-5">
+        <a asp-action="Criar" class="btn btn-everkeep">
+            Escrever no diário
+        </a>
+    </div>
+
+
+    <!-- EMPTY -->
+    @if (!Model.Any())
+    {
+        <div class="everkeep-card text-center p-4">
+
+            <p style="color:#777;">
+                Ainda não escreveu no seu diário.
+            </p>
+
+            <p style="color:#777;">
+                Comece com um pensamento simples.
+            </p>
+
+        </div>
+    }
+    else
+    {
+        <div class="row">
+
+            @foreach (var d in Model)
+            {
+                <div class="col-md-6 mb-4">
+
+                    <div class="diario-card @(d.IsImportante ? "importante" : "")">
+
+                        <!-- HEADER -->
+                        <div class="diario-header">
+
+                            <div class="diario-tags">
+
+                                @if (d.IsImportante)
+                                {
+                                    <span class="tag-importante">⭐ Importante</span>
+                                }
+
+                                @if (d.IsPrivado)
+                                {
+                                    <span class="tag-privado">🔒 Privado</span>
+                                }
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- TEXTO -->
+                        <p class="diario-texto">
+                            @d.Conteudo
+                        </p>
+
+
+                        <!-- FOOTER -->
+                        <div class="diario-footer">
+
+                            <span class="diario-data">
+                                @d.DataCriacao.ToString("dd MMM yyyy")
+                            </span>
+
+                            <div class="diario-actions">
+
+                                <!-- ⭐ IMPORTANTE -->
+                                <form asp-action="MarcarImportante" method="post">
+                                    <input type="hidden" name="id" value="@d.Id" />
+                                    <button type="submit" class="action-btn">
+                                        @(d.IsImportante ? "⭐" : "☆")
+                                    </button>
+                                </form>
+
+                                <!-- 🔒 PRIVADO -->
+                                <form asp-action="MarcarPrivado" method="post">
+                                    <input type="hidden" name="id" value="@d.Id" />
+                                    <button type="submit" class="action-btn">
+                                        @(d.IsPrivado ? "🔒" : "🔓")
+                                    </button>
+                                </form>
+
+                                <!-- ✏️ EDITAR -->
+                                <a asp-action="Editar" asp-route-id="@d.Id" class="everkeep-link">
+                                    Editar
+                                </a>
+
+                                <!-- 🗑 ELIMINAR -->
+                                <form asp-action="Eliminar" method="post" class="form-eliminar">
+                                    <input type="hidden" name="id" value="@d.Id" />
+                                    <button type="button"
+                                            class="action-btn delete-btn"
+                                            onclick="confirmarEliminacao(this)">
+                                        🗑
+                                    </button>
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>
+
+<div id="modalEliminar" class="modal-everkeep">
+
+    <div class="modal-content">
+
+        <p class="modal-text">
+            Tem a certeza que deseja eliminar esta entrada?
+        </p>
+
+        <p class="modal-subtext">
+            Esta ação não pode ser desfeita.
+        </p>
+
+        <div class="modal-actions">
+
+            <button onclick="fecharModal()" class="btn btn-outline-everkeep">
+                Cancelar
+            </button>
+
+            <button id="confirmDeleteBtn" class="btn btn-everkeep">
+                Eliminar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+
+        let formParaEliminar = null;
+
+        function confirmarEliminacao(botao) {
+            formParaEliminar = botao.closest("form");
+            document.getElementById("modalEliminar").style.display = "flex";
+        }
+
+        function fecharModal() {
+            document.getElementById("modalEliminar").style.display = "none";
+            formParaEliminar = null;
+        }
+
+        document.getElementById("confirmDeleteBtn").addEventListener("click", function () {
+            if (formParaEliminar) {
+                formParaEliminar.submit();
+            }
+        });
+
+    </script>
+}

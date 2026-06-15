@@ -1,0 +1,60 @@
+﻿@model List<ApplicationUser>
+
+@{
+    ViewData["Title"] = "Nova Conversa";
+}
+
+<div class="container fade-in">
+
+    <!-- TÍTULO -->
+    <div class="text-center mb-5">
+        <br>
+        <h2 class="hero-title" style="font-size: 36px;">
+            Nova conversa
+        </h2>
+        <br>
+        <p class="hero-subtitle">
+            Escolha alguém com quem gostaria de partilhar algo.
+        </p>
+
+    </div>
+
+    <!-- LISTA -->
+    <div class="row">
+
+        @if (!Model.Any())
+        {
+            <div class="col-12">
+                <div class="everkeep-card text-center">
+
+                    <p style="color:#777;">
+                        Ainda não tem conexões disponíveis.
+                    </p>
+
+                </div>
+            </div>
+        }
+        else
+        {
+            @foreach (var user in Model)
+            {
+                <div class="col-md-4 mb-3">
+
+                    <a asp-action="Chat" asp-route-userId="@user.Id"
+                           class="dashboard-card text-center">
+
+                        <h5>@user.Nome</h5>
+
+                        <p style="color:#777;">
+                            Iniciar conversa
+                        </p>
+
+                    </a>
+
+                </div>
+            }
+        }
+
+    </div>
+
+</div>

@@ -1,0 +1,120 @@
+﻿@page
+@using Microsoft.AspNetCore.Http.Features
+@model TwoFactorAuthenticationModel
+
+@{
+    ViewData["Title"] = "Segurança adicional";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+}
+
+<div class="manage-content-inner">
+
+    <!-- TÍTULO -->
+    <div class="mb-4">
+
+        <h2>
+            Segurança da conta
+        </h2>
+
+        <p>
+            Pode adicionar uma camada extra de segurança à sua conta.
+        </p>
+
+    </div>
+
+    <!-- STATUS -->
+    <partial name="_StatusMessage" for="StatusMessage" />
+
+    @{
+        var consentFeature = HttpContext.Features.Get<ITrackingConsentFeature>();
+    }
+
+    @if (consentFeature?.CanTrack ?? true)
+    {
+        @if (Model.Is2faEnabled)
+        {
+            <!-- ALERTAS -->
+            @if (Model.RecoveryCodesLeft == 0)
+            {
+                <div class="everkeep-alert danger mb-3">
+                    Não tem códigos de recuperação disponíveis.
+                    <br />
+                    Gere novos códigos para garantir acesso à sua conta.
+                </div>
+            }
+            else if (Model.RecoveryCodesLeft <= 3)
+            {
+                <div class="everkeep-alert warning mb-3">
+                    Restam poucos códigos de recuperação (@Model.RecoveryCodesLeft).
+                </div>
+            }
+
+            <!-- AÇÕES -->
+            <div class="mb-4">
+
+                @if (Model.IsMachineRemembered)
+                {
+                    <form method="post" class="mb-2">
+                        <button type="submit" class="btn btn-outline-everkeep">
+                            Remover este dispositivo
+                        </button>
+                    </form>
+                }
+
+                <div class="d-flex flex-wrap gap-2">
+
+                    <a asp-page="./Disable2fa" class="btn btn-outline-everkeep">
+                        Desativar segurança extra
+                    </a>
+
+                    <a asp-page="./GenerateRecoveryCodes" class="btn btn-everkeep">
+                        Gerar novos códigos
+                    </a>
+
+                </div>
+
+            </div>
+        }
+
+        <!-- AUTENTICADOR -->
+        <div class="mb-4">
+
+            <h4 class="section-title">
+                Aplicação autenticadora
+            </h4>
+
+            @if (!Model.HasAuthenticator)
+            {
+                <a asp-page="./EnableAuthenticator" class="btn btn-everkeep">
+                    Ativar aplicação autenticadora
+                </a>
+            }
+            else
+            {
+                <div class="d-flex flex-wrap gap-2">
+
+                    <a asp-page="./EnableAuthenticator" class="btn btn-everkeep">
+                        Configurar novamente
+                    </a>
+
+                    <a asp-page="./ResetAuthenticator" class="btn btn-outline-everkeep">
+                        Repor aplicação
+                    </a>
+
+                </div>
+            }
+
+        </div>
+    }
+    else
+    {
+        <div class="everkeep-alert danger">
+            Para ativar esta funcionalidade, é necessário aceitar a política de privacidade.
+        </div>
+    }
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

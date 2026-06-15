@@ -1,0 +1,140 @@
+﻿@using Everkeep.ViewModels
+
+@model ChatViewModel
+
+@{
+    ViewData["Title"] = "Conversa";
+}
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="chat-header text-center mb-4">
+        <br>
+        <h2 class="chat-title">
+            @Model.NomeOutroUser
+        </h2>
+
+        <p class="chat-subtitle">
+            Um espaço para dizer o que importa
+        </p>
+
+    </div>
+
+
+    <!-- MENSAGENS -->
+    <div class="chat-box">
+
+        @if (!Model.Mensagens.Any())
+        {
+            <div class="text-center">
+
+                <p class="chat-empty">
+                    Esta conversa ainda não começou.
+                </p>
+
+                <p style="color:#777;">
+                    Talvez seja um bom momento para dizer algo.
+                </p>
+
+            </div>
+        }
+        else
+        {
+            foreach (var msg in Model.Mensagens)
+            {
+                /*
+                * Obtém o ID do utilizador autenticado
+                * através dos Claims do ASP.NET Identity.
+                */
+                var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+                /*
+                * Verifica se a mensagem pertence
+                * ao utilizador autenticado.
+                */
+                var isMine = msg.RemetenteId == currentUserId;
+
+                @*
+                 * Classe CSS dinâmica:
+                 * - mine
+                 * - theirs
+                 * 
+                 * Define visualmente quem enviou a mensagem.
+                 *@
+                <div class="chat-message @(isMine ? "mine" : "theirs")">
+
+                    <div class="chat-bubble-wrapper">
+
+                        <!-- BOLHA -->
+                        <div class="chat-bubble">
+
+                            <p>@msg.Conteudo</p>
+
+                            <small>
+                                @msg.DataEnvio.ToString("HH:mm")
+                            </small>
+
+                        </div>
+
+                        <!-- AÇÕES -->
+                        <div class="chat-actions">
+
+                            <!-- FAVORITAR (apenas mensagem do outro) -->
+                            @if (!isMine)
+                            {
+                                <form asp-action="MsgFavorita" method="post">
+                                    <input type="hidden" name="id" value="@msg.Id" />
+                                    <button type="submit"
+                                            class="chat-action-btn favorite @(msg.IsFavorita ? "active" : "")">
+
+                                        @(msg.IsFavorita ? "⭐" : "☆")
+
+                                    </button>
+                                </form>
+                            }
+
+                            <!-- ELIMINAR (apenas minhas mensagens) -->
+                            @if (isMine)
+                            {
+                                <form asp-action="Eliminar" method="post">
+                                    <input type="hidden" name="id" value="@msg.Id" />
+                                    <button type="submit" class="chat-action-btn delete">
+                                        🗑
+                                    </button>
+                                </form>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+        }
+
+    </div>
+
+
+    <!-- INPUT -->
+    <div class="chat-input mt-4">
+
+        <form asp-action="Enviar" method="post" class="d-flex gap-2">
+
+            <input type="hidden" name="destinatarioId" value="@Model.OutroUserId" />
+
+            <input type="text"
+                   name="conteudo"
+                   class="form-control everkeep-input"
+                   placeholder="Escreva algo com significado..."
+                   required />
+
+            <button type="submit" class="btn btn-everkeep">
+                Enviar
+            </button>
+
+        </form>
+
+    </div>
+
+</div>

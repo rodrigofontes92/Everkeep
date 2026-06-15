@@ -1,0 +1,101 @@
+﻿@page
+@model EmailModel
+
+@{
+    ViewData["Title"] = "Email";
+    ViewData["ActivePage"] = ManageNavPages.Email;
+}
+
+<div class="manage-content-inner">
+
+    <!-- TÍTULO -->
+    <div class="mb-4">
+
+        <h2>
+            O seu email
+        </h2>
+
+        <p>
+            Este é o email associado à sua conta. Pode atualizá-lo sempre que precisar.
+        </p>
+
+    </div>
+
+    <!-- STATUS -->
+    <partial name="_StatusMessage" for="StatusMessage" />
+
+    <!-- FORM -->
+    <form id="email-form" method="post">
+
+        <div asp-validation-summary="All" class="text-danger mb-3" role="alert"></div>
+
+        <!-- EMAIL ATUAL -->
+        <div class="form-group mb-4">
+
+            <label class="form-label-everkeep">
+                Email atual
+            </label>
+
+            <div class="d-flex align-items-center gap-2">
+
+                <input asp-for="Email"
+                       class="form-control everkeep-input"
+                       disabled />
+
+                @if (Model.IsEmailConfirmed)
+                {
+                    <span style="color:#5f6f52; font-weight:600;">✔</span>
+                }
+
+            </div>
+
+            @if (!Model.IsEmailConfirmed)
+            {
+                <button id="email-verification"
+                        type="submit"
+                        asp-page-handler="SendVerificationEmail"
+                        class="btn btn-link mt-2 p-0">
+
+                    Enviar email de confirmação
+
+                </button>
+            }
+
+        </div>
+
+        <!-- NOVO EMAIL -->
+        <div class="form-group mb-4">
+
+            <label class="form-label-everkeep">
+                Novo email
+            </label>
+
+            <input asp-for="Input.NewEmail"
+                   class="form-control everkeep-input"
+                   placeholder="Introduza o novo email" />
+
+            <span asp-validation-for="Input.NewEmail" class="text-danger"></span>
+
+        </div>
+
+        <!-- BOTÃO -->
+        <div class="text-center mt-4">
+
+            <button id="change-email-button"
+                    type="submit"
+                    asp-page-handler="ChangeEmail"
+                    class="btn btn-everkeep">
+
+                Atualizar email
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,100 @@
+﻿@using Everkeep.ViewModels
+
+@model List<MemoriaViewModel>
+
+@{
+    ViewData["Title"] = "Memórias";
+}
+
+    <br>
+<div class="container fade-in">
+
+    <!-- TÍTULO -->
+    <div class="text-center mb-5">
+
+        <h2 class="hero-title" style="font-size:36px;">
+            Memórias
+        </h2>
+
+        <p class="hero-subtitle">
+            Palavras e momentos que merecem ser guardados.
+        </p>
+
+    </div>
+
+
+    <!-- EMPTY STATE -->
+    @if (!Model.Any())
+    {
+        <div class="everkeep-card text-center p-4">
+
+            <p style="color:#777;">
+                Ainda não guardou nenhuma memória.
+            </p>
+
+            <p style="color:#777;">
+                Marque mensagens ou diários com ⭐ para vê-los aqui.
+            </p>
+
+        </div>
+    }
+    else
+    {
+        <!-- GRID DE MEMÓRIAS -->
+        <div class="row g-4">
+
+            @foreach (var m in Model)
+            {
+                <div class="col-12 col-md-6 mb-4">
+
+                    <div class="memoria-card">
+
+                        <!-- HEADER -->
+                        <div class="memoria-header">
+
+                            @if (m.Tipo == "Mensagem")
+                            {
+                                <span class="memoria-tag">💬 Mensagem</span>
+                            }
+                            else if (m.Tipo == "Diario")
+                            {
+                                <span class="memoria-tag">📖 Meu diário</span>
+                            }
+
+                        </div>
+
+                        <!-- TEXTO -->
+                        <p class="memoria-texto">
+                            "@m.Conteudo"
+                        </p>
+
+                        <!-- INFO -->
+                        <div class="memoria-info">
+                            @if (m.Tipo == "Mensagem")
+                            {
+                                <span class="memoria-user">
+                                    Enviada por: @m.OutroUserNome
+                                </span>
+                            }
+                            else if (m.Tipo == "Diario")
+                            {
+                                <span class="memoria-user">
+                                    @m.OutroUserNome
+                                </span>
+                            }
+
+                            <span class="memoria-data">
+                                @m.Data.ToString("dd MMM yyyy")
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>

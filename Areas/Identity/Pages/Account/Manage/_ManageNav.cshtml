@@ -1,0 +1,57 @@
+﻿@inject SignInManager<ApplicationUser> SignInManager
+@{
+    var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
+}
+
+<div class="everkeep-card p-3 manage-nav">
+
+    <ul class="manage-nav-list">
+
+        <li>
+            <a class="manage-link @ManageNavPages.IndexNavClass(ViewContext)"
+                   asp-page="./Index">
+                Perfil
+            </a>
+        </li>
+
+        <li>
+            <a class="manage-link @ManageNavPages.EmailNavClass(ViewContext)"
+                   asp-page="./Email">
+                Email
+            </a>
+        </li>
+
+        <li>
+            <a class="manage-link @ManageNavPages.ChangePasswordNavClass(ViewContext)"
+                   asp-page="./ChangePassword">
+                Palavra-passe
+            </a>
+        </li>
+
+        @if (hasExternalLogins)
+        {
+            <li>
+                <a class="manage-link @ManageNavPages.ExternalLoginsNavClass(ViewContext)"
+                       asp-page="./ExternalLogins">
+                    Ligações externas
+                </a>
+            </li>
+        }
+
+        <li>
+            <a class="manage-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)"
+                   asp-page="./TwoFactorAuthentication">
+                Segurança adicional
+            </a>
+        </li>
+
+        <li>
+            <a class="manage-link @ManageNavPages.PersonalDataNavClass(ViewContext)"
+                   asp-page="./PersonalData">
+                Dados pessoais
+            </a>
+        </li>
+
+    </ul>
+
+</div>
