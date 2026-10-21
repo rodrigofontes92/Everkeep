@@ -27,6 +27,16 @@ namespace Everkeep.Data
             // Mantém as configurações padrão do ASP.NET Identity.
             base.OnModelCreating(builder);
 
+            // Estas datas representam horário local sem informação de fuso horário.
+            // Mantemos o tipo compatível com os DateTime.Now já usados pela aplicação.
+            builder.Entity<Mensagem>()
+                .Property(m => m.DataEnvio)
+                .HasColumnType("timestamp without time zone");
+
+            builder.Entity<Diario>()
+                .Property(d => d.DataCriacao)
+                .HasColumnType("timestamp without time zone");
+
             /*
              * RELACIONAMENTO:
              * Mensagem -> Remetente

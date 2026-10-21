@@ -5,28 +5,28 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ObtÈm a connection string definida no appsettings.json.
-// Caso n„o exista, lanÁa uma exceÁ„o.
+// Loads DefaultConnection from application configuration; User Secrets are used in Development.
+// Caso n√£o exista, lan√ßa uma exce√ß√£o.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-// Regista o DbContext da aplicaÁ„o e configura o SQL Server.
+// Configures the application DbContext to use PostgreSQL via Npgsql.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseNpgsql(connectionString));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // Configura o ASP.NET Identity utilizando a classe ApplicationUser.
 //
-// O ApplicationUser representa o utilizador da aplicaÁ„o e herda de IdentityUser,
+// O ApplicationUser representa o utilizador da aplica√ß√£o e herda de IdentityUser,
 // permitindo adicionar propriedades personalizadas como Nome, Bio e EstadoEmocional.
 //
-// O Identity È respons·vel por:
-// - autenticaÁ„o
-// - gest„o de sessıes
+// O Identity √© respons√°vel por:
+// - autentica√ß√£o
+// - gest√£o de sess√µes
 // - hash de passwords
 // - login/logout
-// - seguranÁa de utilizadores
+// - seguran√ßa de utilizadores
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
@@ -35,7 +35,7 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// ConfiguraÁ„o do pipeline HTTP da aplicaÁ„o.
+// Configura√ß√£o do pipeline HTTP da aplica√ß√£o.
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
@@ -48,20 +48,20 @@ else
 // Ativa o sistema de routing.
 app.UseRouting();
 
-// Ativa autenticaÁ„o e autorizaÁ„o.
+// Ativa autentica√ß√£o e autoriza√ß√£o.
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Permite servir ficheiros est·ticos (CSS, JS, imagens, etc.).
+// Permite servir ficheiros est√°ticos (CSS, JS, imagens, etc.).
 app.MapStaticAssets();
 
-// Define a rota padr„o da aplicaÁ„o MVC.
+// Define a rota padr√£o da aplica√ß√£o MVC.
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-// Ativa suporte ‡s Razor Pages do ASP.NET Identity.
+// Ativa suporte √†s Razor Pages do ASP.NET Identity.
 app.MapRazorPages()
    .WithStaticAssets();
 

@@ -81,7 +81,7 @@ Creating a personal collection of meaningful memories.
 - C#
 - Entity Framework Core
 - ASP.NET Identity
-- SQL Server
+- PostgreSQL 18 or a newer stable release
 - Razor Pages
 - Bootstrap 5
 - HTML5
@@ -130,6 +130,8 @@ Main relationships include:
 
 Database schema evolution is managed through EF Core Migrations.
 
+The application uses PostgreSQL through the Npgsql EF Core provider. The older SQL Server migration files are retained under `Migrations/SqlServerLegacy` for reference and are excluded from the active PostgreSQL migration assembly. Existing SQL Server data is not converted by this setup.
+
 ---
 
 ## Security
@@ -147,8 +149,8 @@ Database schema evolution is managed through EF Core Migrations.
 ### Prerequisites
 
 - Visual Studio 2026
-- .NET SDK
-- SQL Server or LocalDB
+- .NET SDK 10
+- PostgreSQL 18
 
 ### Setup
 
@@ -160,9 +162,25 @@ Database schema evolution is managed through EF Core Migrations.
 
 ```cd Everkeep```
 
-- Configure your connection string in:
+- Store the local connection string with Visual Studio's **Manage User Secrets** command for the Everkeep project. Use this key and format:
 
-```appsettings.Development.json```
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Port=5432;Database=everkeep_dev;Username=everkeep_app;Password=<your-local-password>"
+  }
+}
+```
+
+Do not commit the password or put it in `appsettings.json`. The PostgreSQL role must own the local `everkeep_dev` database.
+
+- Restore project dependencies:
+
+```dotnet restore```
+
+- Restore the repository's local EF Core command-line tool:
+
+```dotnet tool restore```
 
 - Apply migrations:
 
