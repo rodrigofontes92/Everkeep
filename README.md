@@ -150,7 +150,7 @@ The application uses PostgreSQL through the Npgsql EF Core provider. The older S
 
 - Visual Studio 2026
 - .NET SDK 10
-- PostgreSQL 18
+- PostgreSQL 18 ([Windows installation and local database setup](docs/postgresql-local-setup.md))
 
 ### Setup
 
