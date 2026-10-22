@@ -13,6 +13,8 @@ obj/
 # Database
 *.mdf
 *.ldf
+app.db-shm
+app.db-wal
 
 # App settings
 appsettings.Development.json

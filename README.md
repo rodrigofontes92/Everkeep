@@ -142,6 +142,8 @@ The application uses PostgreSQL through the Npgsql EF Core provider. The older S
 - Protected private content
 - Secure password storage
 
+Data visibility rules and the repository database audit are documented in the [Data and Privacy Policy](docs/privacy-and-data-policy.md).
+
 ---
 
 ## Running the Project
