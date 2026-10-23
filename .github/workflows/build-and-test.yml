@@ -29,7 +29,17 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: exercises/typescript-async-states/package-lock.json
+          cache-dependency-path: |
+            exercises/react-typed-list-form/package-lock.json
+            exercises/typescript-async-states/package-lock.json
+
+      - name: Install React exercise dependencies
+        working-directory: exercises/react-typed-list-form
+        run: npm ci
+
+      - name: Check and build React exercise
+        working-directory: exercises/react-typed-list-form
+        run: npm run check && npm run build
 
       - name: Install TypeScript exercise dependencies
         working-directory: exercises/typescript-async-states

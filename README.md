@@ -87,6 +87,7 @@ Creating a personal collection of meaningful memories.
 - HTML5
 - CSS3
 - JavaScript
+- React (standalone learning exercise)
 - TypeScript (standalone learning exercise)
 
 ---
@@ -109,6 +110,7 @@ Everkeep
 ├── tests
 │   └── Everkeep.Tests
 ├── exercises
+│   ├── react-typed-list-form
 │   └── typescript-async-states
 └── wwwroot
 ```
@@ -224,6 +226,24 @@ The tests use an in-memory SQLite database. They do not connect to the local Pos
 
 ---
 
+## React Exercise
+
+The standalone exercise in [`exercises/react-typed-list-form`](exercises/react-typed-list-form/README.md) uses typed React props and a small accessible form and list. It demonstrates loading, error, and success states without connecting to the Everkeep MVC application.
+
+It requires Node.js 22.12 or newer. From the exercise directory, install dependencies and start the development server:
+
+```powershell
+npm ci
+npm run dev
+```
+
+Run the TypeScript check and production build with:
+
+```powershell
+npm run check
+npm run build
+```
+
 ## TypeScript Exercise
 
 The standalone exercise in [`exercises/typescript-async-states`](exercises/typescript-async-states/README.md) models asynchronous results as `loading`, `success`, or `error`. It is an independent TypeScript package and does not participate in the ASP.NET Core MVC application.
@@ -241,7 +261,7 @@ npm start
 
 ## Continuous Integration
 
-GitHub Actions runs the **Build and test** workflow defined in `.github/workflows/build-and-test.yml`. It checks the standalone TypeScript exercise, restores dependencies, builds the web application in Release, and runs the test suite for pull requests targeting `develop` or `main`, pushes to those branches, and manual workflow dispatches.
+GitHub Actions runs the **Build and test** workflow defined in `.github/workflows/build-and-test.yml`. It checks and builds both standalone frontend exercises, restores dependencies, builds the web application in Release, and runs the test suite for pull requests targeting `develop` or `main`, pushes to those branches, and manual workflow dispatches.
 
 The workflow verifies build and test results. It does not deploy the application because a hosting provider has not been selected.
 
