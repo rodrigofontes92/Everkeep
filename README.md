@@ -194,6 +194,16 @@ Do not commit the password or put it in `appsettings.json`. The PostgreSQL role 
 
 ---
 
+## Tests
+
+Run the profile and journal authorization suite with:
+
+```powershell
+dotnet test --project tests/Everkeep.Tests/Everkeep.Tests.csproj
+```
+
+---
+
 ## Future Improvements
 
 - Real-time messaging (SignalR)
