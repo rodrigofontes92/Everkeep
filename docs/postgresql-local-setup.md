@@ -83,9 +83,11 @@ Use Visual Studio **Manage User Secrets** for the Everkeep project and set `Conn
 
 ```powershell
 dotnet tool restore
-dotnet ef database update
+dotnet ef database update -- --environment Development
 dotnet run
 ```
+
+The EF Core command uses the Development environment so the startup project can load the local connection string from User Secrets.
 
 ## Troubleshooting
 
