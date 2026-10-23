@@ -1,7 +1,7 @@
 # Everkeep data audit and privacy policy
 
-- **Last reviewed:** 2026-10-22
-- **Policy status:** Approved for implementation in DEV-10
+- **Last reviewed:** 2026-10-23
+- **Policy status:** Implemented and covered by DEV-10 authorization tests
 
 ## Versioned database audit
 
@@ -12,7 +12,7 @@ The tracked `app.db` file was inspected read-only before reuse or publication. I
 - There are no application tables for connections, journal entries, or messages.
 - The file contains no account, email, profile, authentication, connection, journal, or message records.
 
-The active application database is PostgreSQL through Npgsql, configured by `Program.cs` with `ConnectionStrings:DefaultConnection`; the local connection string is supplied through User Secrets. No application code uses the SQLite file. This change removes the obsolete database from the repository and removes its MSBuild copy-to-output rule. SQLite WAL/SHM sidecar files are ignored so local artifacts cannot be added accidentally.
+The active application database is PostgreSQL through Npgsql, configured by `Program.cs` with `ConnectionStrings:DefaultConnection`; the local connection string is supplied through User Secrets. Production application code does not use the SQLite file. DEV-9 removed the obsolete database from version control and its MSBuild copy-to-output rule. SQLite WAL/SHM sidecar files are ignored so local artifacts cannot be added accidentally.
 
 The audited file contained no real or sensitive user data, so no credential rotation or history rewrite is required. The finding is recorded here before removing the empty scaffold.
 
@@ -35,16 +35,15 @@ An **accepted connection** is a relationship whose state is `Aceite`. Pending, r
 
 New journal entries are private by default. The owner may make an entry public; this grants read access only to accepted connections. “Public” does not mean visible to every registered or anonymous visitor. No connection may alter another user's profile or journal.
 
-## Current implementation findings
+## Implementation status
 
-The intended policy above is the acceptance target for DEV-10. The current code has these gaps, which must be closed there before the policy is presented as enforced in the application:
+DEV-10 implemented the visibility rules and added controller-level authorization tests:
 
-- `ProfileController.Index` places the viewed user's name, email, bio, and emotional state in the view model for every authenticated viewer. The profile view renders name, bio, and emotional state without checking `PodeVerPerfil`.
-- The profile view currently shows email to accepted connections. The approved policy allows only the owner to read it.
-- The profile action queries public journal entries before the view checks whether the viewer is the owner or an accepted connection. The controller should apply that access rule before returning data.
-- `DiarioController` already filters the journal page to the signed-in owner, defaults new entries to private, and checks ownership before editing, changing flags/privacy, or deleting an entry.
+- `ProfileController.Index` returns profile fields only to the owner and accepted connections, returns email only to the owner, and queries public journal entries only when the viewer is allowed to see the profile.
+- `DiarioController` lists only the signed-in user's journal entries, defaults new entries to private, and checks ownership before editing, changing privacy or importance, and deleting entries.
+- `tests/Everkeep.Tests/ProfileAndJournalAuthorizationTests.cs` covers allowed and denied profile and journal access, including cross-user mutation attempts.
 
-DEV-10 owns authorization changes and tests for the allowed and denied cases. Until those changes land, the first three findings remain implementation gaps even though the policy and database audit are documented here.
+Run the suite with `dotnet test --project tests/Everkeep.Tests/Everkeep.Tests.csproj`. The current policy tests use SQLite in memory and do not exercise a live PostgreSQL server or full browser flows.
 
 ## Scope
 

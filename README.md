@@ -92,7 +92,7 @@ Creating a personal collection of meaningful memories.
 
 ## Architecture
 
-The project follows the MVC (Model-View-Controller) pattern.
+Everkeep is an ASP.NET Core MVC application targeting .NET 10. It uses ASP.NET Identity for authentication and account management, Entity Framework Core for data access, and Razor views for server-rendered pages. PostgreSQL is the active application database, accessed through the Npgsql EF Core provider.
 
 ```text
 Everkeep
@@ -102,8 +102,11 @@ Everkeep
 ├── ViewModels
 ├── Views
 ├── Data
+├── Migrations
 ├── Areas
 │   └── Identity
+├── tests
+│   └── Everkeep.Tests
 └── wwwroot
 ```
 
@@ -137,7 +140,7 @@ The application uses PostgreSQL through the Npgsql EF Core provider. The older S
 ## Security
 
 - ASP.NET Identity authentication
-- Authorization using ```[Authorize]```
+- Authorization using `[Authorize]`
 - Ownership validation
 - Protected private content
 - Secure password storage
@@ -150,21 +153,33 @@ Data visibility rules and the repository database audit are documented in the [D
 
 ### Prerequisites
 
-- Visual Studio 2026
 - .NET SDK 10
 - PostgreSQL 18 ([Windows installation and local database setup](docs/postgresql-local-setup.md))
+- Visual Studio 2026 is optional; the setup and run commands use the .NET CLI.
 
 ### Setup
 
 - Clone the repository:
 
-```git clone <repository-url>```
+```powershell
+git clone https://github.com/rodrigofontes92/Everkeep.git
+```
 
 - Navigate to the project:
 
-```cd Everkeep```
+```powershell
+cd Everkeep
+```
 
-- Store the local connection string with Visual Studio's **Manage User Secrets** command for the Everkeep project. Use this key and format:
+- Install PostgreSQL, create the local `everkeep_dev` database and the `everkeep_app` role by following the [local PostgreSQL setup guide](docs/postgresql-local-setup.md).
+
+- Store the local connection string in User Secrets for the Everkeep project. From the repository root, run the following command and replace the example password. Alternatively, use Visual Studio's **Manage User Secrets** command for the project.
+
+```powershell
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=everkeep_dev;Username=everkeep_app;Password=your-local-password"
+```
+
+The equivalent User Secrets JSON structure is:
 
 ```json
 {
@@ -176,21 +191,21 @@ Data visibility rules and the repository database audit are documented in the [D
 
 Do not commit the password or put it in `appsettings.json`. The PostgreSQL role must own the local `everkeep_dev` database.
 
-- Restore project dependencies:
+- Restore dependencies and the repository's local EF Core command-line tool:
 
-```dotnet restore```
+```powershell
+dotnet restore
+dotnet tool restore
+```
 
-- Restore the repository's local EF Core command-line tool:
+- Apply database migrations and run the application:
 
-```dotnet tool restore```
+```powershell
+dotnet ef database update -- --environment Development
+dotnet run
+```
 
-- Apply migrations:
-
-```dotnet ef database update```
-
-- Run the application:
-
-```dotnet run```
+The migration command selects the Development environment so EF Core can load the local connection string from User Secrets. The `http` launch profile also runs in Development at `http://localhost:5071`.
 
 ---
 
@@ -201,6 +216,25 @@ Run the profile and journal authorization suite with:
 ```powershell
 dotnet test --project tests/Everkeep.Tests/Everkeep.Tests.csproj
 ```
+
+The tests use an in-memory SQLite database. They do not connect to the local PostgreSQL server. The current suite focuses on profile visibility, journal access, and ownership checks.
+
+---
+
+## Continuous Integration
+
+GitHub Actions runs the **Build and test** workflow defined in `.github/workflows/build-and-test.yml`. It restores dependencies, builds the web application in Release, and runs the test suite for pull requests targeting `develop` or `main`, pushes to those branches, and manual workflow dispatches.
+
+The workflow verifies build and test results. It does not deploy the application because a hosting provider has not been selected.
+
+---
+
+## Current Limitations
+
+- Everkeep is an academic MVP and does not have a production hosting environment or managed database configured.
+- Automated coverage currently focuses on profile and journal authorization. End-to-end UI tests and integration tests against PostgreSQL have not been added.
+- Timeline controller, view model, and view files are present in the repository but excluded from the current application build.
+- The legacy SQL Server migration files are retained for reference. Converting existing SQL Server data to PostgreSQL is not implemented.
 
 ---
 
