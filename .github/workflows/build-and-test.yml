@@ -1,0 +1,39 @@
+name: Build and test
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+  pull_request:
+    branches:
+      - develop
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: Build and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore tests/Everkeep.Tests/Everkeep.Tests.csproj
+
+      - name: Build web application
+        run: dotnet build Everkeep.csproj --configuration Release --no-restore
+
+      - name: Run authorization tests
+        run: dotnet test --project tests/Everkeep.Tests/Everkeep.Tests.csproj --configuration Release --no-restore
