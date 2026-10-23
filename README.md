@@ -87,6 +87,7 @@ Creating a personal collection of meaningful memories.
 - HTML5
 - CSS3
 - JavaScript
+- TypeScript (standalone learning exercise)
 
 ---
 
@@ -107,6 +108,8 @@ Everkeep
 │   └── Identity
 ├── tests
 │   └── Everkeep.Tests
+├── exercises
+│   └── typescript-async-states
 └── wwwroot
 ```
 
@@ -221,9 +224,24 @@ The tests use an in-memory SQLite database. They do not connect to the local Pos
 
 ---
 
+## TypeScript Exercise
+
+The standalone exercise in [`exercises/typescript-async-states`](exercises/typescript-async-states/README.md) models asynchronous results as `loading`, `success`, or `error`. It is an independent TypeScript package and does not participate in the ASP.NET Core MVC application.
+
+From that directory, install its pinned dependencies, check the types, build the example, and run it:
+
+```powershell
+npm ci
+npm run check
+npm run build
+npm start
+```
+
+---
+
 ## Continuous Integration
 
-GitHub Actions runs the **Build and test** workflow defined in `.github/workflows/build-and-test.yml`. It restores dependencies, builds the web application in Release, and runs the test suite for pull requests targeting `develop` or `main`, pushes to those branches, and manual workflow dispatches.
+GitHub Actions runs the **Build and test** workflow defined in `.github/workflows/build-and-test.yml`. It checks the standalone TypeScript exercise, restores dependencies, builds the web application in Release, and runs the test suite for pull requests targeting `develop` or `main`, pushes to those branches, and manual workflow dispatches.
 
 The workflow verifies build and test results. It does not deploy the application because a hosting provider has not been selected.
 
