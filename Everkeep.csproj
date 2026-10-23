@@ -21,6 +21,7 @@
   <ItemGroup>
     <Compile Remove="Controllers\TimelineController.cs" />
     <Compile Remove="ViewModels\TimelineViewModel.cs" />
+    <Compile Remove="tests\**\*.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -20,11 +20,14 @@ namespace Everkeep.Controllers
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index(string userId)
+        public async Task<IActionResult> Index(string? userId)
         {
             var currentUserId = _userManager.GetUserId(User);
 
-            // Se não vier userId, mostrar o próprio perfil
+            if (string.IsNullOrWhiteSpace(currentUserId))
+                return Challenge();
+
+            // Show the signed-in user's profile when no target user is provided.
             if (string.IsNullOrEmpty(userId))
                 userId = currentUserId;
 
@@ -33,39 +36,41 @@ namespace Everkeep.Controllers
             if (user == null)
                 return NotFound();
 
+            var isOwner = currentUserId == userId;
+            var connectionState = "Nenhuma";
+            var isAcceptedConnection = false;
 
-            // verifica a primeira conexão encontrada
-            var conexao = await _context.Conexoes.FirstOrDefaultAsync(c =>
-                (c.User1Id == currentUserId && c.User2Id == userId) ||
-                (c.User1Id == userId && c.User2Id == currentUserId)
-            );
+            if (!isOwner)
+            {
+                var relationships = _context.Conexoes.Where(c =>
+                    (c.User1Id == currentUserId && c.User2Id == userId) ||
+                    (c.User1Id == userId && c.User2Id == currentUserId));
 
-            // Verifica se existe conexão - se não existir, estado = "Nenhuma"
-            string estado = conexao?.Estado ?? "Nenhuma";
+                isAcceptedConnection = await relationships.AnyAsync(c => c.Estado == "Aceite");
+                connectionState = isAcceptedConnection
+                    ? "Aceite"
+                    : await relationships.Select(c => c.Estado).FirstOrDefaultAsync() ?? "Nenhuma";
+            }
 
-            // podeVer é true se estado = "Aceite" ou o utilizador está no seu próprio perfil
-            bool podeVer = estado == "Aceite" || currentUserId == userId;
-
-
-            // somente diários públicos
-            var diariosPublicos = await _context.Diarios
-                .Where(d => d.UserId == userId && !d.IsPrivado)
-                .OrderByDescending(d => d.DataCriacao)
-                .ToListAsync();
+            var canViewProfile = isOwner || isAcceptedConnection;
+            var publicJournalEntries = canViewProfile
+                ? await _context.Diarios
+                    .Where(d => d.UserId == userId && !d.IsPrivado)
+                    .OrderByDescending(d => d.DataCriacao)
+                    .ToListAsync()
+                : new List<Diario>();
 
             var model = new ProfileViewModel
             {
                 UserId = user.Id,
                 CurrentUserId = currentUserId,
-                Nome = user.Nome,
-                Email = user.Email,
-                Bio = user.Bio,
-                EstadoConexao = estado,
-                PodeVerPerfil = podeVer,
-                EstadoEmocional = user.EstadoEmocional,
-
-                // Cada entidade Diario num DiarioViewModel
-                DiariosPublicos = diariosPublicos.Select(d => new DiarioViewModel
+                Nome = canViewProfile ? user.Nome : string.Empty,
+                Email = isOwner ? user.Email ?? string.Empty : string.Empty,
+                Bio = canViewProfile ? user.Bio : string.Empty,
+                EstadoConexao = connectionState,
+                PodeVerPerfil = canViewProfile,
+                EstadoEmocional = canViewProfile ? user.EstadoEmocional : string.Empty,
+                DiariosPublicos = publicJournalEntries.Select(d => new DiarioViewModel
                 {
                     Id = d.Id,
                     Conteudo = d.Conteudo,
