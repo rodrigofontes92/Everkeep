@@ -4,9 +4,9 @@
     {
         // ViewModel utilizado na listagem de conversas do utilizador.
         // Apresenta informações resumidas da última interação de cada chat.
-        public string OutroUserId { get; set; }
-        public string Nome { get; set; }
-        public string UltimaMensagem { get; set; }
+        public required string OutroUserId { get; set; }
+        public string? Nome { get; set; }
+        public required string UltimaMensagem { get; set; }
         public DateTime DataUltimaMensagem { get; set; }
     }
 }

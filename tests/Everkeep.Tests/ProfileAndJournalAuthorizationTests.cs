@@ -28,7 +28,7 @@ public sealed class ProfileAndJournalAuthorizationTests
         testContext.Database.Diarios.AddRange(
             CreateEntry(owner.Id, "Public entry", isPrivate: false),
             CreateEntry(owner.Id, "Private entry", isPrivate: true));
-        await testContext.Database.SaveChangesAsync();
+        await testContext.Database.SaveChangesAsync(Xunit.TestContext.Current.CancellationToken);
 
         var controller = CreateProfileController(testContext, viewer.Id);
         var result = await controller.Index(owner.Id);
@@ -56,7 +56,7 @@ public sealed class ProfileAndJournalAuthorizationTests
             User2Id = owner.Id,
             Estado = state
         });
-        await testContext.Database.SaveChangesAsync();
+        await testContext.Database.SaveChangesAsync(Xunit.TestContext.Current.CancellationToken);
 
         var controller = CreateProfileController(testContext, viewer.Id);
         var result = await controller.Index(owner.Id);
@@ -84,7 +84,7 @@ public sealed class ProfileAndJournalAuthorizationTests
         testContext.Database.Diarios.AddRange(
             CreateEntry(owner.Id, "Public entry", isPrivate: false),
             CreateEntry(owner.Id, "Private entry", isPrivate: true));
-        await testContext.Database.SaveChangesAsync();
+        await testContext.Database.SaveChangesAsync(Xunit.TestContext.Current.CancellationToken);
 
         var controller = CreateProfileController(testContext, viewer.Id);
         var result = await controller.Index(owner.Id);
@@ -150,7 +150,7 @@ public sealed class ProfileAndJournalAuthorizationTests
             CreateEntry(owner.Id, "Owner private", isPrivate: true),
             CreateEntry(owner.Id, "Owner public", isPrivate: false),
             CreateEntry(other.Id, "Other private", isPrivate: true));
-        await testContext.Database.SaveChangesAsync();
+        await testContext.Database.SaveChangesAsync(Xunit.TestContext.Current.CancellationToken);
 
         var controller = CreateJournalController(testContext, owner.Id);
         var result = await controller.Index();
@@ -177,7 +177,7 @@ public sealed class ProfileAndJournalAuthorizationTests
         });
 
         Assert.IsType<RedirectToActionResult>(result);
-        var entry = await testContext.Database.Diarios.SingleAsync();
+        var entry = await testContext.Database.Diarios.SingleAsync(Xunit.TestContext.Current.CancellationToken);
         Assert.Equal(owner.Id, entry.UserId);
         Assert.True(entry.IsPrivado);
         Assert.False(entry.IsImportante);
@@ -191,7 +191,7 @@ public sealed class ProfileAndJournalAuthorizationTests
         await using var testContext = await TestContext.CreateAsync(owner, viewer);
         var entry = CreateEntry(owner.Id, "Original entry", isPrivate: true);
         testContext.Database.Diarios.Add(entry);
-        await testContext.Database.SaveChangesAsync();
+        await testContext.Database.SaveChangesAsync(Xunit.TestContext.Current.CancellationToken);
         var controller = CreateJournalController(testContext, viewer.Id);
 
         Assert.IsType<NotFoundResult>(await controller.Editar(entry.Id));
@@ -203,7 +203,7 @@ public sealed class ProfileAndJournalAuthorizationTests
         Assert.Equal("Original entry", entry.Conteudo);
         Assert.True(entry.IsPrivado);
         Assert.False(entry.IsImportante);
-        Assert.Equal(1, await testContext.Database.Diarios.CountAsync());
+        Assert.Equal(1, await testContext.Database.Diarios.CountAsync(Xunit.TestContext.Current.CancellationToken));
     }
 
     [Theory]
@@ -220,13 +220,13 @@ public sealed class ProfileAndJournalAuthorizationTests
             User2Id = recipient.Id,
             Estado = state
         });
-        await testContext.Database.SaveChangesAsync();
+        await testContext.Database.SaveChangesAsync(Xunit.TestContext.Current.CancellationToken);
         var controller = CreateMessageController(testContext, sender.Id);
 
         var result = await controller.Enviar(recipient.Id, "Hello");
 
         Assert.IsType<ForbidResult>(result);
-        Assert.Empty(await testContext.Database.Mensagens.ToListAsync());
+        Assert.Empty(await testContext.Database.Mensagens.ToListAsync(Xunit.TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -241,13 +241,13 @@ public sealed class ProfileAndJournalAuthorizationTests
             User2Id = recipient.Id,
             Estado = "Aceite"
         });
-        await testContext.Database.SaveChangesAsync();
+        await testContext.Database.SaveChangesAsync(Xunit.TestContext.Current.CancellationToken);
         var controller = CreateMessageController(testContext, sender.Id);
 
         var result = await controller.Enviar(recipient.Id, "Hello");
 
         Assert.IsType<RedirectToActionResult>(result);
-        var message = await testContext.Database.Mensagens.SingleAsync();
+        var message = await testContext.Database.Mensagens.SingleAsync(Xunit.TestContext.Current.CancellationToken);
         Assert.Equal(sender.Id, message.RemetenteId);
         Assert.Equal(recipient.Id, message.DestinatarioId);
         Assert.Equal("Hello", message.Conteudo);
@@ -267,7 +267,7 @@ public sealed class ProfileAndJournalAuthorizationTests
         var result = await controller.Enviar(recipient.Id, content);
 
         Assert.IsType<BadRequestResult>(result);
-        Assert.Empty(await testContext.Database.Mensagens.ToListAsync());
+        Assert.Empty(await testContext.Database.Mensagens.ToListAsync(Xunit.TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -279,23 +279,23 @@ public sealed class ProfileAndJournalAuthorizationTests
         await using var testContext = await TestContext.CreateAsync(sender, recipient, outsider);
         var message = CreateMessage(sender.Id, recipient.Id, "Hello");
         testContext.Database.Mensagens.Add(message);
-        await testContext.Database.SaveChangesAsync();
+        await testContext.Database.SaveChangesAsync(Xunit.TestContext.Current.CancellationToken);
 
         var outsiderController = CreateMessageController(testContext, outsider.Id);
         Assert.IsType<NotFoundResult>(await outsiderController.MsgFavorita(message.Id));
         Assert.IsType<NotFoundResult>(await outsiderController.Eliminar(message.Id));
         Assert.False(message.IsFavorita);
-        Assert.Equal(1, await testContext.Database.Mensagens.CountAsync());
+        Assert.Equal(1, await testContext.Database.Mensagens.CountAsync(Xunit.TestContext.Current.CancellationToken));
 
         var recipientController = CreateMessageController(testContext, recipient.Id);
         Assert.IsType<RedirectResult>(await recipientController.MsgFavorita(message.Id));
         Assert.True(message.IsFavorita);
         Assert.IsType<NotFoundResult>(await recipientController.Eliminar(message.Id));
-        Assert.Equal(1, await testContext.Database.Mensagens.CountAsync());
+        Assert.Equal(1, await testContext.Database.Mensagens.CountAsync(Xunit.TestContext.Current.CancellationToken));
 
         var senderController = CreateMessageController(testContext, sender.Id);
         Assert.IsType<RedirectResult>(await senderController.Eliminar(message.Id));
-        Assert.Empty(await testContext.Database.Mensagens.ToListAsync());
+        Assert.Empty(await testContext.Database.Mensagens.ToListAsync(Xunit.TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -312,7 +312,7 @@ public sealed class ProfileAndJournalAuthorizationTests
             Estado = "Pendente"
         };
         testContext.Database.Conexoes.Add(invitation);
-        await testContext.Database.SaveChangesAsync();
+        await testContext.Database.SaveChangesAsync(Xunit.TestContext.Current.CancellationToken);
 
         var senderController = CreateConnectionController(testContext, sender.Id);
         var outsiderController = CreateConnectionController(testContext, outsider.Id);
@@ -326,10 +326,10 @@ public sealed class ProfileAndJournalAuthorizationTests
         Assert.IsType<RedirectToActionResult>(await recipientController.Aceitar(invitation.Id));
         Assert.Equal("Aceite", invitation.Estado);
         Assert.IsType<NotFoundResult>(await outsiderController.Remover(invitation.Id));
-        Assert.Equal(1, await testContext.Database.Conexoes.CountAsync());
+        Assert.Equal(1, await testContext.Database.Conexoes.CountAsync(Xunit.TestContext.Current.CancellationToken));
 
         Assert.IsType<RedirectToActionResult>(await recipientController.Remover(invitation.Id));
-        Assert.Empty(await testContext.Database.Conexoes.ToListAsync());
+        Assert.Empty(await testContext.Database.Conexoes.ToListAsync(Xunit.TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -345,7 +345,7 @@ public sealed class ProfileAndJournalAuthorizationTests
         testContext.Database.Diarios.AddRange(
             CreateImportantEntry(viewer.Id, "My important journal"),
             CreateImportantEntry(other.Id, "Someone else's journal"));
-        await testContext.Database.SaveChangesAsync();
+        await testContext.Database.SaveChangesAsync(Xunit.TestContext.Current.CancellationToken);
         var controller = CreateMemoriesController(testContext, viewer.Id);
 
         var result = await controller.Index();
@@ -372,7 +372,7 @@ public sealed class ProfileAndJournalAuthorizationTests
         var result = await controller.Criar(new DiarioViewModel { Conteudo = content });
 
         Assert.IsType<BadRequestResult>(result);
-        Assert.Empty(await testContext.Database.Diarios.ToListAsync());
+        Assert.Empty(await testContext.Database.Diarios.ToListAsync(Xunit.TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -479,14 +479,14 @@ public sealed class ProfileAndJournalAuthorizationTests
         public static async Task<TestContext> CreateAsync(params ApplicationUser[] users)
         {
             var connection = new SqliteConnection("Data Source=:memory:");
-            await connection.OpenAsync();
+            await connection.OpenAsync(Xunit.TestContext.Current.CancellationToken);
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseSqlite(connection)
                 .Options;
             var database = new ApplicationDbContext(options);
-            await database.Database.EnsureCreatedAsync();
+            await database.Database.EnsureCreatedAsync(Xunit.TestContext.Current.CancellationToken);
             database.Users.AddRange(users);
-            await database.SaveChangesAsync();
+            await database.SaveChangesAsync(Xunit.TestContext.Current.CancellationToken);
 
             return new TestContext(connection, database, CreateUserManager(users));
         }
