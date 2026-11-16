@@ -40,8 +40,5 @@ Desktop.ini
 # NuGet
 packages/
 
-# Generated files
-wwwroot/lib/
-
 # Secrets
 secrets.json
