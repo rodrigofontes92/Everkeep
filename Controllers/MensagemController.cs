@@ -135,7 +135,7 @@ namespace Everkeep.Controllers
             var remetenteId = GetUserId();
 
             // Impede envio vazio.
-            if (string.IsNullOrEmpty(destinatarioId) || string.IsNullOrEmpty(conteudo))
+            if (string.IsNullOrWhiteSpace(destinatarioId) || string.IsNullOrWhiteSpace(conteudo))
                 return BadRequest();
 
             // Regra crítica: validar conexão aceite

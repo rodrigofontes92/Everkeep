@@ -41,7 +41,7 @@ DEV-10 implemented the visibility rules and added controller-level authorization
 
 - `ProfileController.Index` returns profile fields only to the owner and accepted connections, returns email only to the owner, and queries public journal entries only when the viewer is allowed to see the profile.
 - `DiarioController` lists only the signed-in user's journal entries, defaults new entries to private, and checks ownership before editing, changing privacy or importance, and deleting entries.
-- `tests/Everkeep.Tests/ProfileAndJournalAuthorizationTests.cs` covers allowed and denied profile and journal access, including cross-user mutation attempts.
+- `tests/Everkeep.Tests/ProfileAndJournalAuthorizationTests.cs` covers allowed and denied profile and journal access, message and connection authorization, journal input validation, and memory isolation.
 
 Run the suite with `dotnet test --project tests/Everkeep.Tests/Everkeep.Tests.csproj`. The current policy tests use SQLite in memory and do not exercise a live PostgreSQL server or full browser flows.
 
