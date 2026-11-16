@@ -115,6 +115,8 @@ Everkeep
 └── wwwroot
 ```
 
+For the request flow, authorization boundaries, persistence, and test setup, see [the architecture notes](docs/architecture.md).
+
 ---
 
 ## Core Entities
@@ -222,7 +224,7 @@ Run the profile and journal authorization suite with:
 dotnet test --project tests/Everkeep.Tests/Everkeep.Tests.csproj
 ```
 
-The tests use an in-memory SQLite database. They do not connect to the local PostgreSQL server. The current suite focuses on profile visibility, journal access, and ownership checks.
+The tests use an in-memory SQLite database. They do not connect to the local PostgreSQL server. The suite covers profile visibility, journal ownership and validation, message and connection authorization, and memory isolation.
 
 ---
 
@@ -270,7 +272,7 @@ The workflow verifies build and test results. It does not deploy the application
 ## Current Limitations
 
 - Everkeep is an academic MVP and does not have a production hosting environment or managed database configured.
-- Automated coverage currently focuses on profile and journal authorization. End-to-end UI tests and integration tests against PostgreSQL have not been added.
+- Automated controller tests use in-memory SQLite. End-to-end UI tests and integration tests against PostgreSQL have not been added.
 - Timeline controller, view model, and view files are present in the repository but excluded from the current application build.
 - The legacy SQL Server migration files are retained for reference. Converting existing SQL Server data to PostgreSQL is not implemented.
 

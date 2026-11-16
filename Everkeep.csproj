@@ -22,6 +22,12 @@
     <Compile Remove="Controllers\TimelineController.cs" />
     <Compile Remove="ViewModels\TimelineViewModel.cs" />
     <Compile Remove="tests\**\*.cs" />
+    <Content Remove="tests\**" />
+    <Content Remove="exercises\**" />
+    <EmbeddedResource Remove="tests\**" />
+    <EmbeddedResource Remove="exercises\**" />
+    <None Remove="tests\**" />
+    <None Remove="exercises\**" />
   </ItemGroup>
 
   <ItemGroup>

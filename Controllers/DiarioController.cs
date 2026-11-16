@@ -56,7 +56,7 @@ namespace Everkeep.Controllers
             var userId = GetUserId();
 
             // Impede criação de entradas vazias.
-            if (string.IsNullOrEmpty(model.Conteudo))
+            if (string.IsNullOrWhiteSpace(model.Conteudo))
                 return BadRequest();
 
             // Cria a nova entrada do diário.
@@ -106,7 +106,7 @@ namespace Everkeep.Controllers
                 return NotFound();
 
             // Impede conteúdo vazio.
-            if (string.IsNullOrEmpty(model.Conteudo))
+            if (string.IsNullOrWhiteSpace(model.Conteudo))
                 return BadRequest();
 
             entrada.Conteudo = model.Conteudo;

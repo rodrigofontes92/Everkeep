@@ -206,11 +206,183 @@ public sealed class ProfileAndJournalAuthorizationTests
         Assert.Equal(1, await testContext.Database.Diarios.CountAsync());
     }
 
+    [Theory]
+    [InlineData("Pendente")]
+    [InlineData("Rejeitado")]
+    public async Task Message_send_is_blocked_when_connection_is_not_accepted(string state)
+    {
+        var sender = CreateUser("sender", "Sender", "sender@example.test");
+        var recipient = CreateUser("recipient", "Recipient", "recipient@example.test");
+        await using var testContext = await TestContext.CreateAsync(sender, recipient);
+        testContext.Database.Conexoes.Add(new Conexao
+        {
+            User1Id = sender.Id,
+            User2Id = recipient.Id,
+            Estado = state
+        });
+        await testContext.Database.SaveChangesAsync();
+        var controller = CreateMessageController(testContext, sender.Id);
+
+        var result = await controller.Enviar(recipient.Id, "Hello");
+
+        Assert.IsType<ForbidResult>(result);
+        Assert.Empty(await testContext.Database.Mensagens.ToListAsync());
+    }
+
+    [Fact]
+    public async Task Accepted_connections_can_exchange_messages()
+    {
+        var sender = CreateUser("sender", "Sender", "sender@example.test");
+        var recipient = CreateUser("recipient", "Recipient", "recipient@example.test");
+        await using var testContext = await TestContext.CreateAsync(sender, recipient);
+        testContext.Database.Conexoes.Add(new Conexao
+        {
+            User1Id = sender.Id,
+            User2Id = recipient.Id,
+            Estado = "Aceite"
+        });
+        await testContext.Database.SaveChangesAsync();
+        var controller = CreateMessageController(testContext, sender.Id);
+
+        var result = await controller.Enviar(recipient.Id, "Hello");
+
+        Assert.IsType<RedirectToActionResult>(result);
+        var message = await testContext.Database.Mensagens.SingleAsync();
+        Assert.Equal(sender.Id, message.RemetenteId);
+        Assert.Equal(recipient.Id, message.DestinatarioId);
+        Assert.Equal("Hello", message.Conteudo);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    [InlineData("\t")]
+    public async Task Message_send_rejects_empty_or_whitespace_content(string content)
+    {
+        var sender = CreateUser("sender", "Sender", "sender@example.test");
+        var recipient = CreateUser("recipient", "Recipient", "recipient@example.test");
+        await using var testContext = await TestContext.CreateAsync(sender, recipient);
+        var controller = CreateMessageController(testContext, sender.Id);
+
+        var result = await controller.Enviar(recipient.Id, content);
+
+        Assert.IsType<BadRequestResult>(result);
+        Assert.Empty(await testContext.Database.Mensagens.ToListAsync());
+    }
+
+    [Fact]
+    public async Task Only_message_participants_can_favorite_and_only_sender_can_delete()
+    {
+        var sender = CreateUser("sender", "Sender", "sender@example.test");
+        var recipient = CreateUser("recipient", "Recipient", "recipient@example.test");
+        var outsider = CreateUser("outsider", "Outsider", "outsider@example.test");
+        await using var testContext = await TestContext.CreateAsync(sender, recipient, outsider);
+        var message = CreateMessage(sender.Id, recipient.Id, "Hello");
+        testContext.Database.Mensagens.Add(message);
+        await testContext.Database.SaveChangesAsync();
+
+        var outsiderController = CreateMessageController(testContext, outsider.Id);
+        Assert.IsType<NotFoundResult>(await outsiderController.MsgFavorita(message.Id));
+        Assert.IsType<NotFoundResult>(await outsiderController.Eliminar(message.Id));
+        Assert.False(message.IsFavorita);
+        Assert.Equal(1, await testContext.Database.Mensagens.CountAsync());
+
+        var recipientController = CreateMessageController(testContext, recipient.Id);
+        Assert.IsType<RedirectResult>(await recipientController.MsgFavorita(message.Id));
+        Assert.True(message.IsFavorita);
+        Assert.IsType<NotFoundResult>(await recipientController.Eliminar(message.Id));
+        Assert.Equal(1, await testContext.Database.Mensagens.CountAsync());
+
+        var senderController = CreateMessageController(testContext, sender.Id);
+        Assert.IsType<RedirectResult>(await senderController.Eliminar(message.Id));
+        Assert.Empty(await testContext.Database.Mensagens.ToListAsync());
+    }
+
+    [Fact]
+    public async Task Only_invite_recipient_can_accept_or_reject_and_only_participants_can_remove()
+    {
+        var sender = CreateUser("sender", "Sender", "sender@example.test");
+        var recipient = CreateUser("recipient", "Recipient", "recipient@example.test");
+        var outsider = CreateUser("outsider", "Outsider", "outsider@example.test");
+        await using var testContext = await TestContext.CreateAsync(sender, recipient, outsider);
+        var invitation = new Conexao
+        {
+            User1Id = sender.Id,
+            User2Id = recipient.Id,
+            Estado = "Pendente"
+        };
+        testContext.Database.Conexoes.Add(invitation);
+        await testContext.Database.SaveChangesAsync();
+
+        var senderController = CreateConnectionController(testContext, sender.Id);
+        var outsiderController = CreateConnectionController(testContext, outsider.Id);
+        var recipientController = CreateConnectionController(testContext, recipient.Id);
+
+        Assert.IsType<NotFoundResult>(await senderController.Aceitar(invitation.Id));
+        Assert.IsType<NotFoundResult>(await senderController.Rejeitar(invitation.Id));
+        Assert.IsType<NotFoundResult>(await outsiderController.Aceitar(invitation.Id));
+        Assert.Equal("Pendente", invitation.Estado);
+
+        Assert.IsType<RedirectToActionResult>(await recipientController.Aceitar(invitation.Id));
+        Assert.Equal("Aceite", invitation.Estado);
+        Assert.IsType<NotFoundResult>(await outsiderController.Remover(invitation.Id));
+        Assert.Equal(1, await testContext.Database.Conexoes.CountAsync());
+
+        Assert.IsType<RedirectToActionResult>(await recipientController.Remover(invitation.Id));
+        Assert.Empty(await testContext.Database.Conexoes.ToListAsync());
+    }
+
+    [Fact]
+    public async Task Memories_include_only_the_current_users_received_favorites_and_important_journals()
+    {
+        var viewer = CreateUser("viewer", "Viewer", "viewer@example.test");
+        var sender = CreateUser("sender", "Sender", "sender@example.test");
+        var other = CreateUser("other", "Other", "other@example.test");
+        await using var testContext = await TestContext.CreateAsync(viewer, sender, other);
+        testContext.Database.Mensagens.AddRange(
+            CreateMessage(sender.Id, viewer.Id, "My received favorite", isFavorite: true),
+            CreateMessage(other.Id, sender.Id, "Someone else's favorite", isFavorite: true));
+        testContext.Database.Diarios.AddRange(
+            CreateImportantEntry(viewer.Id, "My important journal"),
+            CreateImportantEntry(other.Id, "Someone else's journal"));
+        await testContext.Database.SaveChangesAsync();
+        var controller = CreateMemoriesController(testContext, viewer.Id);
+
+        var result = await controller.Index();
+
+        var memories = Assert.IsAssignableFrom<IEnumerable<MemoriaViewModel>>(
+            Assert.IsType<ViewResult>(result).Model);
+        Assert.Equal(2, memories.Count());
+        Assert.Contains(memories, memory => memory.Conteudo == "My received favorite");
+        Assert.Contains(memories, memory => memory.Conteudo == "My important journal");
+        Assert.DoesNotContain(memories, memory => memory.Conteudo == "Someone else's favorite");
+        Assert.DoesNotContain(memories, memory => memory.Conteudo == "Someone else's journal");
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    [InlineData("\t")]
+    public async Task Journal_create_rejects_empty_or_whitespace_content(string content)
+    {
+        var owner = CreateUser("owner", "Owner", "owner@example.test");
+        await using var testContext = await TestContext.CreateAsync(owner);
+        var controller = CreateJournalController(testContext, owner.Id);
+
+        var result = await controller.Criar(new DiarioViewModel { Conteudo = content });
+
+        Assert.IsType<BadRequestResult>(result);
+        Assert.Empty(await testContext.Database.Diarios.ToListAsync());
+    }
+
     [Fact]
     public void Profile_and_journal_controllers_require_authenticated_users()
     {
         Assert.NotNull(typeof(ProfileController).GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true).SingleOrDefault());
         Assert.NotNull(typeof(DiarioController).GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true).SingleOrDefault());
+        Assert.NotNull(typeof(MensagemController).GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true).SingleOrDefault());
+        Assert.NotNull(typeof(ConexaoController).GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true).SingleOrDefault());
+        Assert.NotNull(typeof(MemoriasController).GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true).SingleOrDefault());
     }
 
     private static ApplicationUser CreateUser(string id, string name, string email) => new()
@@ -234,6 +406,25 @@ public sealed class ProfileAndJournalAuthorizationTests
         IsImportante = false
     };
 
+    private static Diario CreateImportantEntry(string userId, string content) => new()
+    {
+        UserId = userId,
+        Conteudo = content,
+        DataCriacao = DateTime.UtcNow,
+        IsPrivado = true,
+        IsImportante = true
+    };
+
+    private static Mensagem CreateMessage(string senderId, string recipientId, string content, bool isFavorite = false) => new()
+    {
+        RemetenteId = senderId,
+        DestinatarioId = recipientId,
+        Conteudo = content,
+        DataEnvio = DateTime.UtcNow,
+        IsFavorita = isFavorite,
+        IsImportante = false
+    };
+
     private static ProfileController CreateProfileController(TestContext testContext, string userId) => new(testContext.Database, testContext.UserManager)
     {
         ControllerContext = CreateControllerContext(userId)
@@ -244,15 +435,32 @@ public sealed class ProfileAndJournalAuthorizationTests
         ControllerContext = CreateControllerContext(userId)
     };
 
-    private static ControllerContext CreateControllerContext(string userId) => new()
+    private static MensagemController CreateMessageController(TestContext testContext, string userId) => new(testContext.Database, testContext.UserManager)
     {
-        HttpContext = new DefaultHttpContext
+        ControllerContext = CreateControllerContext(userId)
+    };
+
+    private static ConexaoController CreateConnectionController(TestContext testContext, string userId) => new(testContext.Database, testContext.UserManager)
+    {
+        ControllerContext = CreateControllerContext(userId)
+    };
+
+    private static MemoriasController CreateMemoriesController(TestContext testContext, string userId) => new(testContext.Database, testContext.UserManager)
+    {
+        ControllerContext = CreateControllerContext(userId)
+    };
+
+    private static ControllerContext CreateControllerContext(string userId)
+    {
+        var httpContext = new DefaultHttpContext
         {
             User = new ClaimsPrincipal(new ClaimsIdentity(
                 [new Claim(ClaimTypes.NameIdentifier, userId)],
                 authenticationType: "Test"))
-        }
-    };
+        };
+        httpContext.Request.Headers.Referer = "/";
+        return new ControllerContext { HttpContext = httpContext };
+    }
 
     private sealed class TestContext : IAsyncDisposable
     {
