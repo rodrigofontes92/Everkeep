@@ -81,18 +81,20 @@ Creating a personal collection of meaningful memories.
 - C#
 - Entity Framework Core
 - ASP.NET Identity
-- SQL Server
+- PostgreSQL 18 or a newer stable release
 - Razor Pages
 - Bootstrap 5
 - HTML5
 - CSS3
 - JavaScript
+- React (standalone learning exercise)
+- TypeScript (standalone learning exercise)
 
 ---
 
 ## Architecture
 
-The project follows the MVC (Model-View-Controller) pattern.
+Everkeep is an ASP.NET Core MVC application targeting .NET 10. It uses ASP.NET Identity for authentication and account management, Entity Framework Core for data access, and Razor views for server-rendered pages. PostgreSQL is the active application database, accessed through the Npgsql EF Core provider.
 
 ```text
 Everkeep
@@ -102,10 +104,18 @@ Everkeep
 ├── ViewModels
 ├── Views
 ├── Data
+├── Migrations
 ├── Areas
 │   └── Identity
+├── tests
+│   └── Everkeep.Tests
+├── exercises
+│   ├── react-typed-list-form
+│   └── typescript-async-states
 └── wwwroot
 ```
+
+For the request flow, authorization boundaries, persistence, and test setup, see [the architecture notes](docs/architecture.md).
 
 ---
 
@@ -130,15 +140,19 @@ Main relationships include:
 
 Database schema evolution is managed through EF Core Migrations.
 
+The application uses PostgreSQL through the Npgsql EF Core provider. The older SQL Server migration files are retained under `Migrations/SqlServerLegacy` for reference and are excluded from the active PostgreSQL migration assembly. Existing SQL Server data is not converted by this setup.
+
 ---
 
 ## Security
 
 - ASP.NET Identity authentication
-- Authorization using ```[Authorize]```
+- Authorization using `[Authorize]`
 - Ownership validation
 - Protected private content
 - Secure password storage
+
+Data visibility rules and the repository database audit are documented in the [Data and Privacy Policy](docs/privacy-and-data-policy.md).
 
 ---
 
@@ -146,31 +160,121 @@ Database schema evolution is managed through EF Core Migrations.
 
 ### Prerequisites
 
-- Visual Studio 2026
-- .NET SDK
-- SQL Server or LocalDB
+- .NET SDK 10
+- PostgreSQL 18 ([Windows installation and local database setup](docs/postgresql-local-setup.md))
+- Visual Studio 2026 is optional; the setup and run commands use the .NET CLI.
 
 ### Setup
 
 - Clone the repository:
 
-```git clone <repository-url>```
+```powershell
+git clone https://github.com/rodrigofontes92/Everkeep.git
+```
 
 - Navigate to the project:
 
-```cd Everkeep```
+```powershell
+cd Everkeep
+```
 
-- Configure your connection string in:
+- Install PostgreSQL, create the local `everkeep_dev` database and the `everkeep_app` role by following the [local PostgreSQL setup guide](docs/postgresql-local-setup.md).
 
-```appsettings.Development.json```
+- Store the local connection string in User Secrets for the Everkeep project. From the repository root, run the following command and replace the example password. Alternatively, use Visual Studio's **Manage User Secrets** command for the project.
 
-- Apply migrations:
+```powershell
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=everkeep_dev;Username=everkeep_app;Password=your-local-password"
+```
 
-```dotnet ef database update```
+The equivalent User Secrets JSON structure is:
 
-- Run the application:
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Port=5432;Database=everkeep_dev;Username=everkeep_app;Password=<your-local-password>"
+  }
+}
+```
 
-```dotnet run```
+Do not commit the password or put it in `appsettings.json`. The PostgreSQL role must own the local `everkeep_dev` database.
+
+- Restore dependencies and the repository's local EF Core command-line tool:
+
+```powershell
+dotnet restore
+dotnet tool restore
+```
+
+- Apply database migrations and run the application:
+
+```powershell
+dotnet ef database update -- --environment Development
+dotnet run
+```
+
+The migration command selects the Development environment so EF Core can load the local connection string from User Secrets. The `http` launch profile also runs in Development at `http://localhost:5071`.
+
+---
+
+## Tests
+
+Run the profile and journal authorization suite with:
+
+```powershell
+dotnet test --project tests/Everkeep.Tests/Everkeep.Tests.csproj
+```
+
+The tests use an in-memory SQLite database. They do not connect to the local PostgreSQL server. The suite covers profile visibility, journal ownership and validation, message and connection authorization, and memory isolation.
+
+---
+
+## React Exercise
+
+The standalone exercise in [`exercises/react-typed-list-form`](exercises/react-typed-list-form/README.md) uses typed React props and a small accessible form and list. It demonstrates loading, error, and success states without connecting to the Everkeep MVC application.
+
+It requires Node.js 22.12 or newer. From the exercise directory, install dependencies and start the development server:
+
+```powershell
+npm ci
+npm run dev
+```
+
+Run the TypeScript check and production build with:
+
+```powershell
+npm run check
+npm run build
+```
+
+## TypeScript Exercise
+
+The standalone exercise in [`exercises/typescript-async-states`](exercises/typescript-async-states/README.md) models asynchronous results as `loading`, `success`, or `error`. It is an independent TypeScript package and does not participate in the ASP.NET Core MVC application.
+
+From that directory, install its pinned dependencies, check the types, build the example, and run it:
+
+```powershell
+npm ci
+npm run check
+npm run build
+npm start
+```
+
+---
+
+## Continuous Integration
+
+GitHub Actions runs the **Build and test** workflow defined in `.github/workflows/build-and-test.yml`. It checks and builds both standalone frontend exercises, restores dependencies, builds the web application in Release, and runs the test suite for pull requests targeting `develop` or `main`, pushes to those branches, and manual workflow dispatches.
+
+The workflow verifies build and test results. It does not deploy the application because a hosting provider has not been selected.
+
+---
+
+## Current Limitations
+
+- Everkeep is an academic MVP and does not have a production hosting environment or managed database configured.
+- Automated controller tests use in-memory SQLite. End-to-end UI tests and integration tests against PostgreSQL have not been added.
+- Timeline controller, view model, and view files are present in the repository but excluded from the current application build.
+- The legacy SQL Server migration files are retained for reference. Converting existing SQL Server data to PostgreSQL is not implemented.
 
 ---
 

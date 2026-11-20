@@ -19,29 +19,32 @@
             👤
         </div>
 
-        <h2 class="profile-name mt-3">
-            @Model.Nome
-        </h2>
-
-        @if (Model.EstadoConexao == "Aceite")
+        @if (Model.PodeVerPerfil)
         {
-            <p class="profile-email">
-                @Model.Email
-            </p>
-        }
+            <h2 class="profile-name mt-3">
+                @Model.Nome
+            </h2>
 
-        @if (!string.IsNullOrEmpty(Model.Bio))
-        {
-            <p class="profile-bio mt-2">
-                @Model.Bio
-            </p>
-        }
+            @if (isMeuPerfil && !string.IsNullOrWhiteSpace(Model.Email))
+            {
+                <p class="profile-email">
+                    @Model.Email
+                </p>
+            }
 
-        @if (!string.IsNullOrEmpty(Model.EstadoEmocional))
-        {
-            <p class="profile-estado mt-2">
-                Hoje sinto-me @Model.EstadoEmocional
-            </p>
+            @if (!string.IsNullOrEmpty(Model.Bio))
+            {
+                <p class="profile-bio mt-2">
+                    @Model.Bio
+                </p>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.EstadoEmocional))
+            {
+                <p class="profile-estado mt-2">
+                    Hoje sinto-me @Model.EstadoEmocional
+                </p>
+            }
         }
 
     </div>

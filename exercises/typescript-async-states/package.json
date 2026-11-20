@@ -1,0 +1,14 @@
+{
+  "name": "everkeep-typescript-async-states",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "build": "tsc",
+    "start": "node dist/example.js"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}

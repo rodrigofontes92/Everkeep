@@ -13,6 +13,9 @@ obj/
 # Database
 *.mdf
 *.ldf
+app.db
+app.db-shm
+app.db-wal
 
 # App settings
 appsettings.Development.json
@@ -36,9 +39,6 @@ Desktop.ini
 
 # NuGet
 packages/
-
-# Generated files
-wwwroot/lib/
 
 # Secrets
 secrets.json
